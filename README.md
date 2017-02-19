@@ -11,3 +11,6 @@ I Borrowed some code from :
 ู* https://www.udacity.com/course/machine-learning-for-trading--ud501
 * http://matplotlib.org/examples/pylab_examples/finance_demo.
 
+Use datasets (EOD data files from SET)
+
+* http://siamchart.com/stock/
