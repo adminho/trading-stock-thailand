@@ -8,7 +8,7 @@ In file [indicator.py](indicator.py), there are my examples for compute the tech
 
 I Borrowed some code from : 
 
-ู* https://www.udacity.com/course/machine-learning-for-trading--ud501
+* https://www.udacity.com/course/machine-learning-for-trading--ud501
 * http://matplotlib.org/examples/pylab_examples/finance_demo.
 
 Use datasets (EOD data files from SET)
