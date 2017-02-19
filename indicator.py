@@ -138,15 +138,14 @@ def rsi(df):
 	RSI = 100 - 100/(RS+1)
 	return RSI
 	
-def sharpe_ratio(rp, rf):	
-	if rf is NaN:	#This line waiting test
-		rf = pd.DataFrame(index=rp.index)
+def sharpe_ratio(rp, rf=float('nan')):	
+	if np.isnan(rf):	
+		rf = rp.copy()
 		rf.ix[0:] = 0
-		print(rf)
 		
 	# rp = Expected porfolio return
 	# rf = Risk free rate
-	ret = rp - rf	
+	ret = rp - rf
 	# Sharpe ratio = mean(Expected porfolio return - Risk free rate)/Portfolio standard deviation
 	return ret.mean()/ret.std()
 	
