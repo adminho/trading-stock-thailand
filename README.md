@@ -6,7 +6,7 @@ In [indicator.py](indicator.py) file, there are my examples for compute the tech
 
 `ROC, Bollinger Band (BBANDS), daily returns, SMA, EMA, MACD, RSI, Sharpe ratio,True Range (TR), ATR, Beta, OBV and etc`
 
-I Borrowed some code from : 
+I Borrowed some code from
 
 * https://www.udacity.com/course/machine-learning-for-trading--ud501
 * http://matplotlib.org/examples/pylab_examples/finance_demo.
