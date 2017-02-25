@@ -1,6 +1,6 @@
 # Trading example codes
 
-This repository collects my example codes in Python for studing in [The Stock Exchange of Thailand (SET)](http://www.set.or.th/set/mainpage.do)
+This repository collects my example codes in Python for studing in [The Stock Exchange of Thailand (SET)](http://www.set.or.th/set/mainpage.do) that is developing (not yet)
 
 In file [indicator.py](indicator.py), there are my examples for compute the technical indicators for security including
 
