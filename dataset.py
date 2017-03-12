@@ -5,6 +5,7 @@ import pandas as pd
 import shutil	
 import utility as util
 import indicator as ind
+from sklearn import preprocessing
 
 def getFileNameInDir(path):
 	onlyFiles = [ join(path,f) for f in listdir(path) if isfile(join(path, f)) ]
@@ -52,12 +53,12 @@ DIR_SEC_CSV = "sec_csv"
 # download: http://siamchart.com/stock/			
 EOD_file = "set-archive_EOD_UPDATE"
 def createSymbolCSV(start_idex, outputPath=DIR_SEC_CSV):
-	eodFiles = data.getFileNameInDir(EOD_file)	
+	eodFiles = getFileNameInDir(EOD_file)	
 	eodFiles = eodFiles[-1 * start_idex:]		# select files latest N days
 	
 	clearDir(outputPath) # delete old files
 	
-	dataStock  = data.getStockData(eodFiles)	
+	dataStock  = getStockData(eodFiles)	
 	headers = getHeaderFile(eodFiles)	# Read header of CSV files
 	columnNames = { index:value  for index, value in enumerate(headers)}
 	
@@ -150,70 +151,274 @@ def prepareDataSet(symbols, dates, csv_dir=DIR_SEC_CSV,output_dir=output_dataset
 		
 	df_Y = util.loadPriceData(symbols, dates)			
 	writeDataSetY(df_Y, symbols)
-	
-def getTrainData(symbol, dates, periods=14):
-	# day periods that predict a price is new high or not
-	price = util.loadPriceData([symbol], dates)	
-	# skip periods day latest
-	price_sliced = price[0: len(price) - periods] 
-		
-	roc = ind.roc(price_sliced)
-	rsi = ind.rsi(price_sliced)/10 			# normalize
-	sr = ind.create_dataframe_SR(price_sliced, [symbol])
-	myRatio = ind.get_myRatio(price_sliced)
-	slope = ind.fitLine(price_sliced)
-	
-	ema26, ema12, MACD = ind.average_convergence(price_sliced)
-	MACD  = MACD # normalize
-	# bbands = ind.get_BBANDS(close, symbol)
-		
-	# rename column
-	#roc.rename(columns={symbol:'ROC'},inplace=True)
-	rsi.rename(columns={symbol:'RSI'},inplace=True)
-	sr.rename(columns={symbol:'SR'},inplace=True)
-	#close.rename(columns={symbol:'CLOSE'},inplace=True)
-	#ema26.rename(columns={symbol:'EMA26'},inplace=True)
-	#ema12.rename(columns={symbol:'EMA12'},inplace=True)
-	MACD.rename(columns={symbol:'MACD'},inplace=True)
-	myRatio.rename(columns={symbol:'MY'},inplace=True)
-	slope.rename(columns={symbol:'SLOPE'},inplace=True)
 
+def getTrainData_1(symbol, startDate, endDate, periods=14, remove_head=19):
+	dates = pd.date_range(startDate, endDate)	
+	df = util.loadPriceData([symbol], dates)		
+	util.fill_missing_values(df)
+	
+	# skip periods day latest (14 days) that predict a price is new high or not
+	df_sliced = df.ix[0: len(df) - periods] 
+	price_close = pd.DataFrame(df_sliced[symbol])
+	set = pd.DataFrame(df_sliced['SET'])
+	
+	rsi = ind.rsi(price_close)/100 # normalize
+	sr = ind.create_dataframe_SR(df_sliced, [symbol])
+	myRatio = ind.get_myRatio(price_close)
+	daily = ind.daily_returns(price_close)*100 # normalize
+	_, _, macd = ind.average_convergence(price_close)
+		
+	ohlcv = util.load_OHLCV(symbol, dates)
+	percent_KD = ind.percent_KD(ohlcv)/100  # normalize 		
+	c2o =	ind.daily_returns_2(ohlcv)*100 # normalize
+	
 	volume = util.loadVolumeData(symbol, dates)
-	# skip periods day latest
-	volume_sliced = volume.ix[0: len(volume) - periods] 
-	assert len(volume_sliced) == len(price_sliced)
-	obv = ind.OBV(volume_sliced, price_sliced)
-
-	#obv = util.normalize_data(obv)
-	obv_rsi = ind.rsi(obv)/10 	# calcuate momentum and normalize
-	obv_rsi.rename(columns={symbol:'OBV_RSI'},inplace=True)
-
-	Xtrain = pd.DataFrame(index=price_sliced.index)
-	#Xtrain = Xtrain.join(roc['ROC']) # I think it not work
-	Xtrain = Xtrain.join(rsi['RSI'])
-	Xtrain = Xtrain.join(sr['SR'])
-	#Xtrain = Xtrain.join(close['CLOSE'])
-	#Xtrain = Xtrain.join(ema26['EMA26'])
-	#Xtrain = Xtrain.join(ema12['EMA12'])
-	Xtrain = Xtrain.join(MACD['MACD'])
-	#Xtrain = Xtrain.join(bbands['UPPER'])
-	#Xtrain = Xtrain.join(bbands['LOWER'])
-	Xtrain = Xtrain.join(myRatio['MY'])
-	Xtrain = Xtrain.join(slope['SLOPE'])
-	Xtrain = Xtrain.join(obv_rsi['OBV_RSI'])
-
-	newHight = ind.isNewHigh(price, periods=periods)
-	Ylogit = 1*newHight[symbol]  # 1 is True (new hight) , 0 is False
-
-	#close = util.normalize_data(price_sliced)	# normalize
+	#skip periods day latest
+	volume_sliced = volume.ix[0: len(volume) - periods]
+	assert len(volume_sliced) == len(df_sliced)
+	obv = ind.OBV(volume_sliced, df_sliced)
+	obv_rsi = ind.rsi(obv)/100 	# calcuate momentum with rsi and normalize
+	set_rsi = ind.rsi(set)/100 	# calcuate momentum with rsi and normalize
 	
-	# skip at head row, avoid NaN
-	Xtrain = Xtrain[30:]
-	Ylogit = Ylogit[30:]
-	close = price_sliced.ix[30:][symbol]
-	closeDf = pd.DataFrame(close,columns=[symbol])	
-	return Xtrain, Ylogit, closeDf
+	# Join data frame
+	# rename column	
+	rsi.rename(columns={symbol:'RSI'},inplace=True)
+	#sr.rename(columns={symbol:'SR'},inplace=True)		
+	myRatio.rename(columns={symbol:'MY'},inplace=True)	
+	daily.rename(columns={symbol:'DAILY'},inplace=True)	
+	macd.rename(columns={symbol:'MACD'},inplace=True)
+	obv_rsi.rename(columns={symbol:'OBV_RSI'},inplace=True)
+	set_rsi.rename(columns={'SET':'SET_RSI'},inplace=True)
+	
+	Xtrain = pd.DataFrame(index=df_sliced.index)	
+	Xtrain = Xtrain.join(rsi['RSI'])
+	Xtrain = Xtrain.join(percent_KD['%K'])
+	#Xtrain = Xtrain.join(sr['SR'])		
+	Xtrain = Xtrain.join(myRatio['MY'])
+	Xtrain = Xtrain.join(daily['DAILY'])
+	Xtrain = Xtrain.join(macd['MACD'])	
+	Xtrain = Xtrain.join(c2o)	
+	Xtrain = Xtrain.join(obv_rsi['OBV_RSI'])
+	Xtrain = Xtrain.join(set_rsi)
+	
+	upTrend = ind.isUpTrend(df, symbol, periods=periods)
+	Ydigit = 1 * upTrend[symbol]  # multiply 1 : True is converted to 1 (up trend) , False becomes 0
+	
+	# skip at head row, avoid NaN values
+	Xtrain = Xtrain.ix[remove_head:]
+	Ydigit = Ydigit.ix[remove_head:]
+	price_close = price_close.ix[remove_head:]
+	return Xtrain, Ydigit, price_close
+
+def packSeqData(X, Y, sequence_length, size_test=5):
+	Xpacked = []
+	height, width = X.shape
+	
+	for index in range(0, height - sequence_length + 1):
+		Xsliced = X[index: index + sequence_length]
+		Xpacked.append(Xsliced.values)
+
+	#examples, time series or length of input (n days), dim. of each value or number of features (each technical indicator)	
+	Xpacked = np.array(Xpacked)
+	assert np.shape(Xpacked) == Xpacked.shape
 		
+	Xtrain, Xtest = Xpacked[:-size_test], Xpacked[-size_test:]
+	assert Xtest.shape[0] == size_test
+	assert Xtrain.shape[0] + size_test == Xpacked.shape[0]
+	
+	Ypacked = Y[sequence_length-1:]
+	Ytrain, Ytest = Ypacked[:-size_test], Ypacked[-size_test:]
+	assert Ytest.shape[0] == size_test
+	assert Ytrain.shape[0] + size_test == Ypacked.shape[0]
+		
+	return Xtrain, Xtest, Ytrain, Ytest
+
+def getTrainData_2(symbol, startDate, endDate, remove_head=15):
+	dates = pd.date_range(startDate, endDate)	
+	df = util.loadPriceData([symbol], dates)				#1	
+	close = df.ix[0:len(df)-1] 	# skip tail
+	assert len(df) == len(close) + 1
+	
+	ema5 = ind.ema(close, periods=5)						#2
+	sma5 = ind.ema(close, periods=5)						#3	
+	ema15 = ind.ema(close, periods=5)						#4
+	sma15 = ind.ema(close, periods=5)						#5
+		
+	bb1p = ind.get_BBANDS(close, symbol, periods=14, mul=1) #6, #7
+	bb2p = ind.get_BBANDS(close, symbol, periods=14, mul=2)	#8, #9
+	_, _, macd = ind.average_convergence(close)		#10
+	signal_macd = ind.signal_MACD(macd)						#11
+	
+	rsi = ind.rsi(close)									#12
+	
+	ohlcv = util.load_OHLCV(symbol, dates)
+	percent_KD = ind.percent_KD(ohlcv) 						#14, 15
+	
+	# rename columns
+	close.rename(columns={symbol:'CLOSE'},inplace=True)	
+	ema5.rename(columns={symbol:'EMA5'},inplace=True)
+	sma5.rename(columns={symbol:'SMA5'},inplace=True)
+	ema15.rename(columns={symbol:'EMA15'},inplace=True)
+	sma15.rename(columns={symbol:'SMA15'},inplace=True)	
+	bb1p.rename(columns={'LOWER':'LOWER_BB1P'},inplace=True)
+	bb1p.rename(columns={'UPPER':'UPPER_BB1P'},inplace=True)
+	bb2p.rename(columns={'LOWER':'LOWER_BB2P'},inplace=True)
+	bb2p.rename(columns={'UPPER':'UPPER_BB2P'},inplace=True)		
+	macd.rename(columns={symbol:'MACD'},inplace=True)
+	signal_macd.rename(columns={symbol:'SG_MACD'},inplace=True)
+	rsi.rename(columns={symbol:'RSI'},inplace=True)
+	
+	Xtrain = pd.DataFrame(index=close.index)	
+	Xtrain = Xtrain.join(close['CLOSE'])		# 1
+	Xtrain = Xtrain.join(ema5['EMA5'])			# 2
+	Xtrain = Xtrain.join(sma5['SMA5'])			# 3
+	Xtrain = Xtrain.join(ema15['EMA15'])		# 4
+	Xtrain = Xtrain.join(sma15['SMA15'])		# 5
+	Xtrain = Xtrain.join(bb1p['LOWER_BB1P'])	# 6
+	Xtrain = Xtrain.join(bb1p['UPPER_BB1P'])	# 7
+	Xtrain = Xtrain.join(bb2p['LOWER_BB2P'])	# 8
+	Xtrain = Xtrain.join(bb2p['UPPER_BB2P'])	# 9
+	Xtrain = Xtrain.join(macd['MACD'])			# 10
+	Xtrain = Xtrain.join(signal_macd['SG_MACD']) # 11
+	Xtrain = Xtrain.join(rsi['RSI'])			# 12
+	Xtrain = Xtrain.join(percent_KD)			# 13
+	
+	Ytrain = df[symbol].shift(-1) # skip SET and shift 
+	Ytrain.dropna(0, inplace=True) 
+	assert len(Ytrain) == len(Xtrain)
+	
+	# skip at head row, avoid NaN values
+	Xtrain = Xtrain[remove_head:]
+	Ytrain = Ytrain[remove_head:]		
+	
+	return Xtrain,  Ytrain
+	
+def getTrainData_3(symbol, startDate, endDate, remove_head=15):
+	dates = pd.date_range(startDate, endDate)	
+	
+	df = util.loadPriceData([symbol], dates)				#1	
+	close = df.ix[0:len(df)-1] 	# skip tail
+	assert len(df) == len(close) + 1
+	
+	ema5 = ind.ema(close, periods=5)						#2
+	sma5 = ind.ema(close, periods=5)						#3	
+	ema15 = ind.ema(close, periods=5)						#4
+	sma15 = ind.ema(close, periods=5)						#5
+		
+	bb1p = ind.get_BBANDS(close, symbol, periods=14, mul=1) #6, #7
+	bb2p = ind.get_BBANDS(close, symbol, periods=14, mul=2)	#8, #9
+	_, _, macd = ind.average_convergence(close)		#10
+	signal_macd = ind.signal_MACD(macd)						#11
+	
+	rsi = ind.rsi(close)									#12
+	
+	ohlcv = util.load_OHLCV(symbol, dates)
+	percent_KD = ind.percent_KD(ohlcv) 						#14, 15
+	
+	# rename columns
+	close.rename(columns={symbol:'CLOSE'},inplace=True)	
+	ema5.rename(columns={symbol:'EMA5'},inplace=True)
+	sma5.rename(columns={symbol:'SMA5'},inplace=True)
+	#ema15.rename(columns={symbol:'EMA15'},inplace=True)
+	#sma15.rename(columns={symbol:'SMA15'},inplace=True)	
+	bb1p.rename(columns={'LOWER':'LOWER_BB1P'},inplace=True)
+	bb1p.rename(columns={'UPPER':'UPPER_BB1P'},inplace=True)
+	#bb2p.rename(columns={'LOWER':'LOWER_BB2P'},inplace=True)
+	#bb2p.rename(columns={'UPPER':'UPPER_BB2P'},inplace=True)		
+	macd.rename(columns={symbol:'MACD'},inplace=True)
+	#signal_macd.rename(columns={symbol:'SG_MACD'},inplace=True)
+	rsi.rename(columns={symbol:'RSI'},inplace=True)
+	
+	Xtrain = pd.DataFrame(index=close.index)	
+	Xtrain = Xtrain.join(close['CLOSE'])		# 1
+	Xtrain = Xtrain.join(ema5['EMA5'])			# 2
+	Xtrain = Xtrain.join(sma5['SMA5'])			# 3
+	#Xtrain = Xtrain.join(ema15['EMA15'])		# 4
+	#Xtrain = Xtrain.join(sma15['SMA15'])		# 5
+	Xtrain = Xtrain.join(bb1p['LOWER_BB1P'])	# 6
+	Xtrain = Xtrain.join(bb1p['UPPER_BB1P'])	# 7
+	#Xtrain = Xtrain.join(bb2p['LOWER_BB2P'])	# 8
+	#Xtrain = Xtrain.join(bb2p['UPPER_BB2P'])	# 9
+	Xtrain = Xtrain.join(macd['MACD'])			# 10
+	#Xtrain = Xtrain.join(signal_macd['SG_MACD']) # 11
+	Xtrain = Xtrain.join(rsi['RSI'])			# 12
+	Xtrain = Xtrain.join(percent_KD)			# 13
+	
+	df = df[symbol] # skip SET
+	daily = ind.daily_returns(df)	
+	daily = daily.shift(-1) 		# predict tommorow 
+	daily.dropna(0, inplace=True) 	# drop NaN in last row
+	Ytrain = 1 * (daily > 0.0) 		# if positive it converted 1, or 0 in negative
+	assert len(Ytrain) == len(Xtrain)
+	
+	# skip at head row, avoid NaN values
+	Xtrain = Xtrain[remove_head:]
+	Ytrain = Ytrain[remove_head:]		
+	
+	# normalize	
+	normalizer = preprocessing.Normalizer().fit(Xtrain)
+	Xnorm = normalizer.transform(Xtrain) 
+	Xnorm = pd.DataFrame(Xnorm, columns=Xtrain.columns)
+		
+	return Xnorm,  Ytrain
+
+def getTrainData_4(symbol, startDate, endDate, periods=14, remove_head=19):
+	dates = pd.date_range(startDate, endDate)	
+	
+	# day periods that predict a price is new high or not
+	df = util.loadPriceData([symbol], dates)		
+	
+	# skip periods day latest
+	df_sliced = df.ix[0: len(df) - periods]
+		
+	price_close = pd.DataFrame(df_sliced[symbol])
+	set = pd.DataFrame(df_sliced['SET'])
+	
+	bbands = ind.get_BBANDS(price_close, symbol) 
+	ema26, ema12, macd = ind.average_convergence(price_close)
+	rsi = ind.rsi(price_close)
+	daily = ind.daily_returns(price_close)
+		
+	ohlcv = util.load_OHLCV(symbol, dates)
+	percent_KD = ind.percent_KD(ohlcv)
+		
+	volume = util.loadVolumeData(symbol, dates)
+	#skip periods day latest
+	volume_sliced = volume.ix[0: len(volume) - periods] 
+	assert len(volume_sliced) == len(price_close)
+	
+	volume_sliced = pd.DataFrame(volume_sliced[symbol])
+	obv = ind.OBV(volume_sliced, price_close)
+		
+	# Join data frame
+	# rename column	
+	price_close.rename(columns={symbol:'CLOSE'},inplace=True)
+	ema26.rename(columns={symbol:'EMA26'},inplace=True)
+	ema12.rename(columns={symbol:'EMA12'},inplace=True)
+	daily.rename(columns={symbol:'DAILY'},inplace=True)
+	rsi.rename(columns={symbol:'RSI'},inplace=True)	
+	obv.rename(columns={symbol:'OBV'},inplace=True)
+		
+	Xtrain = price_close			
+	Xtrain = Xtrain.join(bbands['UPPER']) 
+	Xtrain = Xtrain.join(bbands['LOWER']) 
+	Xtrain = Xtrain.join(ema26) 
+	Xtrain = Xtrain.join(ema12)
+	Xtrain = Xtrain.join(rsi)
+	Xtrain = Xtrain.join(percent_KD['%K'])
+	Xtrain = Xtrain.join(obv)
+	Xtrain = Xtrain.join(set)
+			
+	upTrend = ind.isUpTrend(df, symbol, periods=periods)
+	Ydigit = 1 * upTrend[symbol]  # multiply 1 : True is converted to 1 (up trend) , False becomes 0
+	assert len(Xtrain) == len(Ydigit)
+	
+	# skip at head row, avoid NaN values
+	Xtrain = Xtrain.ix[remove_head:]
+	Ydigit = Ydigit.ix[remove_head:]	
+	Xtrain.fillna(0, inplace=True)	 # protected NaN value	
+	return Xtrain, Ydigit
+	
 def _getStockSymbol(csvFilename):	
 	df = pd.read_csv(csvFilename, encoding = "TIS-620")
 	symbols = np.append(['SET'], df.values.T[0])
@@ -232,17 +437,20 @@ def getSET50Symbol():
 
 def getSubIndustrySymbol():		
 	return _getStockSymbol("list_Index_Sub_Instrudry.csv")
-	
+
 def getAllSymbol(path=DIR_SEC_CSV):
-	symbols = [ f.replace(".csv","") for f in listdir(path) if isfile(join(path, f)) ]	
-	#symbols2 = ['SET']
+	symbols1 = [ f.replace(".csv","") for f in listdir(path) if isfile(join(path, f)) ]	
+	symbols2 = ['SET']
+	symbols2 = np.append(symbols2, _getStockSymbol('listedCompanies_th_TH.csv'))
 	#symbols2 = np.append(symbols2, getSET100Symbol())
 	#symbols2 = np.append(symbols2, getSETHDSymbol())
+	
+
 	#symbols2 = np.append(symbols2, getSubIndustrySymbol())
 	
-	#result = list(set(symbols1) & set(symbols2))	
-	#result = np.unique(result)
-	return symbols
+	result = list(set(symbols1) & set(symbols2))	
+	result = np.unique(result)
+	return result
 
 
 
