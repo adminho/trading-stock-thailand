@@ -1,3 +1,4 @@
+# All formula : reference at http://stockcharts.com/school/doku.php?id=chart_school/
 import pandas as pd
 import numpy as np
 
@@ -49,15 +50,26 @@ def get_bollinger_bands(rm, rstd):
     return upper_band, lower_band	
 
 def daily_returns(df):
-    """Compute and return the daily return values."""
+	"""Compute and return the daily return values."""
 	# (current_price / previous_price) -1
 	# daily_returns = (df / df.shift(1)) - 1
-    daily_returns = df.pct_change()
-    daily_returns.ix[0, :] = 0
-	    
-    return daily_returns
+	daily_returns = df.pct_change(); 
+	daily_returns.ix[0] = 0
+		    
+	return daily_returns
+
+def daily_returns_2(df):
+	"""Compute and return the daily return values."""
+	# from pervious close to current open close
+	# (current_open_price / previous_close_price) -1	
+	current_open = df['OPEN']
+	previos_close = df['CLOSE'].shift(1)
+	daily_returns_2 = (current_open/ previos_close) - 1
+	#daily_returns = df.pct_change(); 
+	#daily_returns_2.ix[0] = 0		    		
+	return pd.DataFrame(daily_returns_2, columns=['C2O'])
 	
-def	BBANDS(df_price, periods=20):	
+def	BBANDS(df_price, periods=20, mul=2):	
 	# Middle Band = 20-day simple moving average (SMA)
 	df_middle_band = pd.rolling_mean(df_price, window=periods)
 	
@@ -68,18 +80,30 @@ def	BBANDS(df_price, periods=20):
 	df_std = pd.rolling_std(df_price, window=periods)
 	
 	# Upper Band = 20-day SMA + (20-day standard deviation of price x 2)
-	df_upper_band = df_middle_band + (df_std * 2)
+	df_upper_band = df_middle_band + (df_std * mul)
 	
 	# Lower Band = 20-day SMA - (20-day standard deviation of price x 2)
-	df_lower_band = df_middle_band - (df_std * 2)	
+	df_lower_band = df_middle_band - (df_std * mul)	
 	
 	return (df_upper_band, df_middle_band, df_lower_band)
 
-def	get_BBANDS(df, symbol, periods=20):	
-	(upper, middle, lower) = BBANDS(df[symbol], periods)		
+def	get_BBANDS(df, symbol, periods=20, mul=2):	
+	(upper, middle, lower) = BBANDS(df[symbol], periods, mul)		
 	df_BBANDS = pd.concat([upper, middle, lower], axis=1, join='inner')
 	df_BBANDS.columns = ['UPPER', 'MIDDLE', 'LOWER']
 	return df_BBANDS
+
+def get_myRatio(df_price, periods=20):
+	# Middle Band = 20-day simple moving average (SMA)
+	df_middle_band = pd.rolling_mean(df_price, window=periods)
+	
+	# 20-day standard deviation of price
+	""" Pandas uses the unbiased estimator (N-1 in the denominator), 
+	whereas Numpy by default does not.
+	To make them behave the same, pass ddof=1 to numpy.std()."""	
+	df_std = pd.rolling_std(df_price, window=periods)
+		
+	return (df_price - df_middle_band)/(df_std * 2)
 
 def diff_BBANDS(df_price, periods=20):		
 	(upper, middle, lower) = BBANDS(df_price, periods)	
@@ -104,7 +128,10 @@ def average_convergence(df, period_low=26, period_fast=12):
     emaslow = ema(df, period_low)
     emafast = ema(df, period_fast)
     return (emaslow, emafast, emafast - emaslow)	
-	
+
+def signal_MACD(df_MACD, periods=9):
+	return ema(df_MACD, periods)
+
 def rsi(df):				
 	periods=14
 	# Price change,	df_change = df - df.shift(1)
@@ -129,17 +156,27 @@ def rsi(df):
 		#Average Loss = [(previous Average Loss) x 13 + current Loss] / 14.
 		df_avg_loss.ix[index] =	(df_avg_loss.ix[index-1] * 13 + df_loss.ix[index])/periods
 
-	# RS = Average Gain / Average Loss		
-	RS = df_avg_gain/df_avg_loss	
-	
+	# RS = Average Gain / Average Loss	
+	# if coding as bellow, it has a bug when df_avg_loss is zero (can't divid with zero)
+	# RS = df_avg_gain/df_avg_loss
+	# But I change coding with for loop instead
+	RS = pd.DataFrame(columns = df.columns, index = df.index)
+	for index in RS.index:		
+		for sym in df.columns:
+			lossValue = df_avg_loss.ix[index][sym]
+			if lossValue == 0:
+				RS.ix[index][sym] = 100
+			else:	
+				RS.ix[index][sym] = df_avg_gain.ix[index][sym]/lossValue			
+		
 	#              100
     # RSI = 100 - --------
     #             1 + RS
-	RSI = 100 - 100/(RS+1)
+	RSI = 100 - 100/(1 + RS)
 	return RSI
 	
-def sharpe_ratio(rp, rf=float('nan')):	
-	if np.isnan(rf):	
+def sharpe_ratio(rp, rf=None):	
+	if rf is None:	
 		rf = rp.copy()
 		rf.ix[0:] = 0
 		
@@ -153,9 +190,9 @@ def rolling_sharpe_ratio(rp, rf, window):
 	# Example
 	# rp = df_daily_return[symbol]
 	# rf = df_daily_return['SET']	
-	result = rp - rf	
-	mean = get_rolling_mean(result, window)	
-	std = get_rolling_std(result, window )
+	ret = rp - rf	
+	mean = get_rolling_mean(ret, window)	
+	std = get_rolling_std(ret, window )
 	# Sharpe ratio = mean(Expected porfolio return - Risk free rate)/Portfolio standard deviation
 	return mean/std
 
@@ -171,7 +208,7 @@ def create_dataframe_SR(df, symbols, window=5):
 	return df_sr
 
 def isStrongSR(df_sr, window=10):
-	df_compare = df_sr > 0					    # Sharpe ratio is more than 0, dialy return is pluss 
+	df_compare = df_sr > 0					    # Sharpe ratio is more than 0, daily return is pluss 
 	df_sum = pd.rolling_sum(df_compare, window) # Sharpe ratio is more than 0 contiue [window] days
 	return 1* (df_sum==window) 					# True When Sharpe ratio > 10 continually (by default), multiply 1 to convert integer number
 
@@ -216,7 +253,48 @@ def getBeta(df, stock_name, benchmark_name):
 	# Beta = Covariance(rs, rb)/Variance(rb)
 	# where rs is the return on the stock and rb is the return on a benchmark index.
 	return rs.cov(rb)/rb.var()	
+
+def listLowBeta(df):
+	betaList = []
+	stockName = df.columns.values[1:] # skip 'SET'
+	for name in stockName:
+		beta = getBeta(df, name, 'SET')
+		betaList = np.append(betaList, beta)
+		
+	indexList= np.argsort(betaList) # index of min values is at first of the queue 
+	symbolBeta = [stockName[index] for index in indexList] 
+	# order symbol names from low Beta to high Beta	
+	return symbolBeta
+
+def percent_KD(df, periods=14):
+	"""
+	%K = (Current Close - Lowest Low)/(Highest High - Lowest Low) * 100
+	%D = 3-day SMA of %K
+
+	Lowest Low = lowest low for the look-back period
+	Highest High = highest high for the look-back period
+	%K is multiplied by 100 to move the decimal point two places
+	"""
+	current = df['CLOSE'] # Current Close
+	low = df['LOW']	# Lowest Low
+	high = df['HIGH']	# Highest High
+	finish = len(df)-periods + 1
 	
+	K_ = pd.DataFrame(index=df.index, columns=['%K'])
+	K_[0:] = np.float('nan')
+	
+	for index in range(0, finish):
+		Highest_High = np.max(high[index: index+periods])		
+		Lowest_Low = np.min(low[index: index+periods])
+		position = index + periods - 1
+		current_close = current.ix[position]
+		K_.ix[position] = (current_close - Lowest_Low) /(Highest_High - Lowest_Low) *100
+		
+	D_ = sma(K_, periods=3)
+	D_.rename(columns={'%K':'%D'},inplace=True)
+	resultDf = K_.join(D_)
+	return resultDf
+
 def OBV(df_volume, df_close):			
 	# create empty Data Frame
 	df_OBV = pd.DataFrame(index = df_volume.index, columns = df_volume.columns)
@@ -236,7 +314,7 @@ def OBV(df_volume, df_close):
 		
 			#If the closing prices equals the prior close price then:
 			#Current OBV = Previous OBV (no change)		
-		
+
 			change = df_price_change.ix[index][symbol]
 			current_volume =  df_volume.ix[index][symbol]
 			
@@ -285,11 +363,11 @@ def gain(df):
 
 import matplotlib.pyplot as plt	
 def compare_stock(df, x_stock, y_stock):	
-	df_dialy_returns = daily_returns(df)	
-	df_dialy_returns.plot(kind='scatter', x = x_stock, y = y_stock)
+	df_daily_returns = daily_returns(df)	
+	df_daily_returns.plot(kind='scatter', x = x_stock, y = y_stock)
 	
-	X = df_dialy_returns[x_stock] 
-	Y = df_dialy_returns[y_stock]
+	X = df_daily_returns[x_stock] 
+	Y = df_daily_returns[y_stock]
 	
 	beta, alpha = np.polyfit(X, Y, 1)
 	print('Beta is {}, Alpha is {}'.format(beta, alpha))
@@ -298,26 +376,64 @@ def compare_stock(df, x_stock, y_stock):
 	fx = beta*X + alpha	
 	plt.plot(X, fx, 'r-')
 	plt.show()
-	
-def isNewHigh(df ,periods =14):
-	finish = len(df) - periods + 1
-	resultDf = pd.DataFrame(columns=df.columns) # empty
-	
-	for index in range(0, finish):
-		windowDf = df.ix[index: index+periods] # slice n periods
-		current = df.ix[index]
-		compare = windowDf > current
+
+# I think don't work
+def isProfit(df_price, symbol, periods=14):
+	finish = len(df_price) - periods +1
+	resultDf = pd.DataFrame(columns=[symbol]) # empty
 		
-		# new high from current price is True
-		# but side way or new low is False
-		# count boolean
-		result = pd.rolling_sum(compare, window=periods)	
-		result = result.shift(-(periods-1))
+	for index in range(1, finish):
+		sliced = df_price.ix[index-1: index+periods] # slice n periods					
+		result = create_dataframe_SR(sliced, [symbol], window = periods+1)		
+		result = result.shift(-periods)
+		#result.dropna(0, inplace=True)
+		compare = result.ix[0] > 1
+		resultDf = resultDf.append(compare)	
+	
+	return resultDf
+
+def isUpTrend(df_price , symbol, periods =14):	
+	finish = len(df_price) - periods +1
+	resultDf = pd.DataFrame(columns=df_price.columns) # empty
+	
+	for index in range(1, finish):
+		sliced = df_price.ix[index-1: index+periods] # slice n periods			
+		# compute RSI
+		result = rsi(pd.DataFrame(sliced, columns=df_price.columns))
+		result = result.shift(-periods)
 		result.dropna(0, inplace=True)
-		result = result > periods-5 # number new high compare with current price
-		resultDf = resultDf.append(result)
-			
+		compare = result >50 	# RSI > 50			
+		resultDf = resultDf.append(compare)		
+	
 	return resultDf
 			
+from scipy.stats import linregress
+def fitLine(df_price, periods = 14):	
+	X = np.arange(0, periods)
+	df_slope = pd.DataFrame(index=df_price.index, columns=df_price.columns)
+	df_slope[0:] = float('nan')
+	finish = len(df_price) - periods+1	
 	
+	for sym in df_price.columns:
+		for index in range(0, finish):
+			Y = df_price.ix[index: index+periods][sym]
+			slope, intercept, r, p, stderr = linregress(X, Y)		
+			df_slope.ix[index+periods-1][sym] = slope
+	
+	return df_slope
+
+def listLowVolatility(df):	
+	allDaily = daily_returns(df)
+
+	mean = allDaily.mean()
+	std = allDaily.std()
+	compare = np.abs(allDaily - mean ) > std
+	assert compare.shape == allDaily.shape
+	
+	countVolatility = compare.sum()	
+	indexList= np.argsort(countVolatility) # index of min values is at first of the queue 
+	columName = allDaily.columns.values
+	symbol = [columName[index] for index in indexList] 
+	# order symbol names from low variant to high variant
+	return symbol
 
