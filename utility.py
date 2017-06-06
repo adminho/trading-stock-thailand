@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+from matplotlib.finance import date2num
 
 def changeColumnName(df, postfix):
 	df.columns = [ '{}_{}'.format(sym, postfix) for sym in df.columns ]
@@ -25,11 +26,10 @@ def loadStockData(symbols, dates, column_name, base_dir):
 	df = pd.DataFrame(index=dates)	# empty data frame that has indexs as dates
 	if 'SET' not in symbols:  # add SET for reference, if absent
 		symbols = np.append(['SET'],symbols)
-	
-	#date_list = [ d.strftime("%Y%m%d") for d in dates]	
+
 	for symbol in symbols:
 		# read CSV file path given ticker symbol.
-		csv_file = os.path.join(base_dir, "{}.csv".format(symbol)) 
+		csv_file = os.path.join(base_dir, symbol + '.csv'); 
 		df_temp = pd.read_csv(csv_file, index_col='<DTYYYYMMDD>',
 			parse_dates=True, usecols=['<DTYYYYMMDD>', column_name], na_values=['nan'])
 		
@@ -81,3 +81,8 @@ def loadStockQuotes(symbol, dates):
 	quotes = df.to_records(convert_datetime64=True).tolist() 
 	quotes = [ (date2num(d), o, c, h, l) for d,o,c,h,l in quotes  ]	
 	return quotes
+
+from time import gmtime, strftime
+def getCurrentDateStr():
+    #currentDateStr = strftime("%Y-%m-%d %H:%M:%S", gmtime())    
+    return strftime("%Y-%m-%d", gmtime())    
