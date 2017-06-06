@@ -1,11 +1,12 @@
 import os.path
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter, WeekdayLocator,DayLocator, MONDAY
-from matplotlib.finance import date2num, candlestick_ohlc
-
+from matplotlib.finance import candlestick_ohlc
 
 import indicator as ind
+import utility as utl
 import utilmodel as utm
 
 def plotStock(df, columns, start_index, end_index, title="Selected data"):
@@ -37,7 +38,7 @@ def plotDailyHist(df, symbol, title="Selected data"):
 # Borrowed code from : http://matplotlib.org/examples/pylab_examples/finance_demo.
 def plotCandlestick(symbol, start_index, end_index, title="Selected data"):
 	dates = pd.date_range(start_index, end_index)	
-	quotes = loadStockQuotes(symbol, dates)		
+	quotes = utl.loadStockQuotes(symbol, dates)		
 	
 	mondays = WeekdayLocator(MONDAY)        # major ticks on the mondays
 	alldays = DayLocator()              	# minor ticks on the days
@@ -75,11 +76,10 @@ def _plotColorLine(close, Ydigit, ax):
 		
 	ax.plot(red.index, red.values, '-r',  green.index, green.values,'-g')	
 	ax.legend(['Not', 'predict new high'])
-	#ax.plot(close.index, close, '-b')
-		
-def plot1ColLine(symbol, close, Ydigit):
+			
+def plot1ColLine(symbol, close, Ydigit, title):
 	_plotColorLine(close, Ydigit, plt)	
-	plt.title(symbol)
+	plt.title(title)
 	plt.xlabel('Dates')
 	plt.ylabel('Price')
 	plt.show()
