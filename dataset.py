@@ -172,7 +172,7 @@ def getTrainData_1(symbol, startDate, endDate, periods=14, remove_head=19):
 	percent_KD = ind.percent_KD(ohlcv)/100  # normalize 		
 	c2o =	ind.daily_returns_2(ohlcv)*100 # normalize
 	
-	volume = util.loadVolumeData(symbol, dates)
+	volume = util.loadVolumeData([symbol], dates)	
 	#skip periods day latest
 	volume_sliced = volume.ix[0: len(volume) - periods]
 	assert len(volume_sliced) == len(df_sliced)
