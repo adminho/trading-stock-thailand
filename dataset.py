@@ -430,10 +430,10 @@ def getSETHDSymbol():
 	return _getStockSymbol("list_SETHD.csv")	
 	
 def getSET100Symbol():	
-	return _getStockSymbol("list_SET_100.csv")	
+	return _getStockSymbol("list_SET100.csv")
 
 def getSET50Symbol():		
-	return _getStockSymbol("list_SET_50.csv")
+	return _getStockSymbol("list_SET50.csv")
 
 def getSubIndustrySymbol():		
 	return _getStockSymbol("list_Index_Sub_Instrudry.csv")
