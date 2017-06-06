@@ -35,16 +35,18 @@ def is_strong(df_close, window=12):
 
 def get_rolling_mean(values, window):
     """Return rolling mean of given values, using specified window size."""
-    return pd.rolling_mean(values, window=window)
+    #return pd.rolling_mean(values, window=window)
+    return values.rolling(center=False, window=window).mean()
 
 def get_rolling_std(values, window):
     """Return rolling standard deviation of given values, using specified window size."""
-    # TODO: Compute and return rolling standard deviation
-    return pd.rolling_std(values, window=window)
-
+    # Compute and return rolling standard deviation
+    #return pd.rolling_std(values, window=window)
+    return values.rolling(center=False,window=window).std()
+	
 def get_bollinger_bands(rm, rstd):
     """Return upper and lower Bollinger Bands."""
-    # TODO: Compute upper_band and lower_band
+    # Compute upper_band and lower_band
     upper_band = rm + rstd * 2
     lower_band = rm - rstd * 2
     return upper_band, lower_band	
@@ -87,7 +89,7 @@ def	BBANDS(df_price, periods=20, mul=2):
 	
 	return (df_upper_band, df_middle_band, df_lower_band)
 
-def	get_BBANDS(df, symbol, periods=20, mul=2):	
+def get_BBANDS(df, symbol, periods=20, mul=2):	
 	(upper, middle, lower) = BBANDS(df[symbol], periods, mul)		
 	df_BBANDS = pd.concat([upper, middle, lower], axis=1, join='inner')
 	df_BBANDS.columns = ['UPPER', 'MIDDLE', 'LOWER']
@@ -95,14 +97,16 @@ def	get_BBANDS(df, symbol, periods=20, mul=2):
 
 def get_myRatio(df_price, periods=20):
 	# Middle Band = 20-day simple moving average (SMA)
-	df_middle_band = pd.rolling_mean(df_price, window=periods)
-	
+	#df_middle_band = pd.rolling_mean(df_price, window=periods)
+	df_middle_band = df_price.rolling(center=False, window=periods).mean()	
+ 
 	# 20-day standard deviation of price
 	""" Pandas uses the unbiased estimator (N-1 in the denominator), 
 	whereas Numpy by default does not.
 	To make them behave the same, pass ddof=1 to numpy.std()."""	
-	df_std = pd.rolling_std(df_price, window=periods)
-		
+	#df_std = pd.rolling_std(df_price, window=periods)
+	df_std = df_price.rolling(center=False, window=periods).std()
+	
 	return (df_price - df_middle_band)/(df_std * 2)
 
 def diff_BBANDS(df_price, periods=20):		
@@ -113,12 +117,14 @@ def diff_BBANDS(df_price, periods=20):
 			
 def sma(df, periods=12):
 	# compute simple moving average
-	return pd.rolling_mean(df, window=periods)	
+	#return pd.rolling_mean(df, window=periods)	
+	return df.rolling(center=False, window=periods).mean()
 
 # not sure	
 def ema(df, periods=12):
 	# compute exponential moving average
-	return pd.ewma(df, span = periods)
+	#return pd.ewma(df, span = periods)
+      return df.ewm(span=periods, adjust=True, min_periods=0, ignore_na=False).mean()
 
 def average_convergence(df, period_low=26, period_fast=12):
     """
@@ -436,4 +442,35 @@ def listLowVolatility(df):
 	symbol = [columName[index] for index in indexList] 
 	# order symbol names from low variant to high variant
 	return symbol
+ 
+def compute_gain(df, signal):    
+    sum_buy = 0
+    sum_sell = 0
+
+    temp_pred = signal[0]
+    if temp_pred == 1:    
+        sum_buy += df.values[0][0]
+
+    df_len = len(df)
+    for index in range(1, df_len):
+        pred = signal[index]
+        close = df.values[index][0]
+    
+        if temp_pred  == pred:
+            if index == df_len - 1 and pred == 1:
+                sum_sell += close
+            continue
+    
+        # temp_pred != pred
+        temp_pred = pred            
+        if pred == 0:        
+            sum_sell += close        
+            continue     
+        # if pred == 1
+        sum_buy += close
+
+    # Gain(%) = 100 x Sum(Sell(i) - Buy(i))/Sum(Buy(i))
+    gain =  100 * (sum_sell - sum_buy)/sum_buy
+    return gain
+  
 
