@@ -15,4 +15,4 @@ Download datasets (EOD data files from SET)
 
 * http://siamchart.com/stock/
 
-In [LSTM_predict_trend.py](LSTM_predict_trend.py) file, I'm trying to apply Deep Learning (LSTM network) to predict a stock trend
+In [LSTM_predict_trend.py](LSTM_predict_trend.py) file, I'm trying to apply Deep Learning (LSTM network) to predict a stock trend (Not complete)
