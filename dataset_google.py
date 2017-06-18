@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Jun  3 12:31:19 2017
-
-@author: Administrator
-"""
 
 # How to install
 # references: https://pypi.python.org/pypi/googlefinance
