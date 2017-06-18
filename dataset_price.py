@@ -34,14 +34,15 @@ def createDataFrame(table_element):
         if th_list is not None:
             for th in th_list:
                 head_list.append(th.find(text=True))
-        
-        td_list = tr.findAll('td')       
+                
+        td_list = tr.findAll('td') 
+         
         for td in td_list:
-            row_list.append(td.find(text=True))
+            row_list = np.append(row_list, td.find(text=True))        
         
-    num_col = len(head_list)            
-    shape_row = len(row_list)/num_col
-    row_list = np.reshape(row_list, (shape_row,num_col)) 
+    num_col = len(head_list)        
+    total_col = int(len(row_list)/num_col)    
+    row_list = np.reshape(row_list, (total_col, num_col) )       
     df=pd.DataFrame(columns = head_list, data = row_list)
     return df
 
@@ -74,10 +75,14 @@ if __name__ == "__main__" :
     symbol_list = ['AOT', 'BBL']
     for symbol in symbol_list:
         df = create_all_data(symbol, total_page = 2)
-        print('\n********* %s **********' % symbol)
-        print(df.head())
+        print('\n********* %s **********' % symbol)        
+        print(df.tail())
         
         # save csv file (all stock data)
         removeOldFile(symbol) # clear old
         writeCSVFile(df, symbol)
 
+#For test
+#table_element, url_string = getTableData("PTT") 
+#tr_list = table_element.findAll('tr') 
+#print(tr_list[0:2])   
