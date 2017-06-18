@@ -1,11 +1,10 @@
 import os
-from os import listdir, makedirs, remove
+from os import listdir, makedirs
 from os.path import isfile, join, exists
 import numpy as np
 import pandas as pd
 import shutil	
-import utility as util
-import indicator as ind
+
 
 import matplotlib.pyplot as plt
 from matplotlib.finance import date2num
