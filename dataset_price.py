@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Jun  3 12:31:19 2017
-
-@author: Administrator
-"""
-
-
 import urllib
 from bs4 import BeautifulSoup
 import numpy as np
@@ -78,7 +71,7 @@ def removeOldFile(symbol, output_path=DIR_SEC_CSV):
         remove(csv_file)	
 
 if __name__ == "__main__" :
-    symbol_list = ['AOT', 'BBL', 'SCB', 'TCB', 'CPN']
+    symbol_list = ['AOT', 'BBL']
     for symbol in symbol_list:
         df = create_all_data(symbol, total_page = 2)
         print('\n********* %s **********' % symbol)
