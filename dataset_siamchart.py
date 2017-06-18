@@ -122,6 +122,29 @@ def loadStockQuotes(symbol, dates):
 	quotes = [ (date2num(d), o, c, h, l) for d,o,c,h,l in quotes  ]	
 	return quotes
 
+def loadManySymbols(symbols, dates, column_name, base_dir):
+	"""Read securities data for given symbols from CSV files."""
+	df = pd.DataFrame(index=dates)	# empty data frame that has indexs as dates
+	if 'SET' not in symbols:  # add SET for reference, if absent
+		symbols = np.append(['SET'],symbols)
+
+	for symbol in symbols:
+		# read CSV file path given ticker symbol.
+		csv_file = os.path.join(base_dir, symbol + '.csv'); 
+		df_temp = pd.read_csv(csv_file, index_col='Date',
+			parse_dates=True, usecols=['Date', column_name], na_values=['nan'])
+		
+		df_temp = df_temp.rename(columns={column_name: symbol})
+		df = df.join(df_temp) # left join by default
+		
+		if symbol == 'SET':  # drop dates SET did not trade (nan values)
+			df = df.dropna(subset=["SET"])
+	 
+	return df
+
+def loadPriceData(symbols, dates,  base_dir=DIR_SEC_CSV):
+	return loadManySymbols(symbols, dates, 'Close', base_dir)
+	
 # Borrowed code from : http://matplotlib.org/examples/pylab_examples/finance_demo.
 def plotCandlestick(symbol, dates, title="Selected data"):	
 	quotes = loadStockQuotes(symbol, dates)		
@@ -143,6 +166,7 @@ def plotCandlestick(symbol, dates, title="Selected data"):
 
 	ax.xaxis_date()
 	ax.autoscale_view()
+	ax.set_title(title)
 	plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
 
 	plt.show()
@@ -150,12 +174,20 @@ def plotCandlestick(symbol, dates, title="Selected data"):
 from time import gmtime, strftime
 if __name__ == "__main__" :	
 	#Creat CSV for stock symbols		
-	#createSymbolCSV(2000)
+	createSymbolCSV(2000)
 	#currentDateStr = strftime("%Y-%m-%d %H:%M:%S", gmtime())    	
 	startDate = '2017-03-01'
 	endDate = strftime("%Y-%m-%d", gmtime())    
 	dates = pd.date_range(startDate, endDate)
 	df = load_OHLCV("PTT", dates)
 	print(df.tail())
+	plotCandlestick("PTT", dates, title ="PTT symbol")
+	print()
 	
-	plotCandlestick("PTT", dates)
+	symbols = ["PTT", "AOT", "SCC", "CPALL"]
+	df = loadPriceData(symbols, dates)
+	print(df.tail())
+	
+	df = df/df.iloc[0,:] # normalized 
+	df.plot()
+	plt.show()
