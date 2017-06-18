@@ -1,4 +1,4 @@
-# Trading example codes
+# Trading example codes (not yet)
 
 This repository collects my example codes in Python for studing in [The Stock Exchange of Thailand (SET)](http://www.set.or.th/set/mainpage.do) that is developing (__not yet__)
 
