@@ -419,8 +419,9 @@ def getTrainData_4(symbol, startDate, endDate, periods=14, remove_head=19):
 	Xtrain.fillna(0, inplace=True)	 # protected NaN value	
 	return Xtrain, Ydigit
 	
-def _getStockSymbol(csvFilename):	
-	df = pd.read_csv(csvFilename, encoding = "TIS-620")
+DIR_LIST_CSV = "list_securities"
+def _getStockSymbol(csvFilename):	    
+	df = pd.read_csv(join(DIR_LIST_CSV, csvFilename), encoding = "TIS-620")
 	symbols = np.append(['SET'], df.values.T[0])
 	
 	symbols = [ sym.replace('COM7','COM7_') for sym in symbols ] # fix bug only
