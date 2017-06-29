@@ -15,7 +15,7 @@ print()
 # pip install quandl
 print("+++++quandl example+++++")
 import quandl
-quandl.ApiConfig.api_key = 'hGjH3Bsv8czZQBB515hE' #(your api that must register at https://www.quandl.com/)
+quandl.ApiConfig.api_key = 'hGjH3Bsv8czZQBB515hE' #(must register at https://www.quandl.com/)
 print("THAISE index:")
 data = quandl.get("THAISE/INDEX")
 #data = quandl.get("THAISE/INDEX", authtoken="hGjH3Bsv8czZQBB515hE")
@@ -32,13 +32,13 @@ print()
 # pip install pandas-datareader
 
 # But does't work, It has some bug
-# Fix bug: https://github.com/ranaroussi/fix-yahoo-finance (The feature, I think that the bug is solved)
+# Fix bug: https://github.com/ranaroussi/fix-yahoo-finance (The future, I think that the bug is solved)
 # pip install fix_yahoo_finance --upgrade --no-cache-dir
 print("+++++pandas_datareader+++++")
 from pandas_datareader import data as pdr
 import fix_yahoo_finance as yf # <== that's all it takes :-)
 
-# If you Stock of Thailand, the symbol must be following '.BK'
+# For Stock of Thailand, the symbol must be followed with '.BK'
 # download dataframe
 ptt = pdr.get_data_yahoo("PTT.BK", start="2017-01-01", end="2017-04-30")
 print(ptt.tail())
