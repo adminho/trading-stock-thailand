@@ -15,7 +15,7 @@ print()
 # pip install quandl
 print("+++++quandl example+++++")
 import quandl
-quandl.ApiConfig.api_key = 'hGjH3Bsv8czZQBB515hE' #(must register at https://www.quandl.com/)
+quandl.ApiConfig.api_key = 'xxxxxxxx' #(must register at https://www.quandl.com/)
 print("THAISE index:")
 data = quandl.get("THAISE/INDEX")
 #data = quandl.get("THAISE/INDEX", authtoken="hGjH3Bsv8czZQBB515hE")
