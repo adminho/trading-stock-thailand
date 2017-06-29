@@ -30,15 +30,15 @@ def getStockData(eodFiles, selectedSmbol = []):
 		all_data = df.values;
 				
 		#range(start, stop, step)
-		for row in range(total_row-1, -1, -1):	# reveserse form range(0, total_row)
-			symbol = all_data[row][0]			# name of stock in frist column			
+		for row in range(total_row-1, -1, -1):	# reverse form range(0, total_row)
+			symbol = all_data[row][0]			# name of stock in the first column
 			if len(selectedSmbol)!=0 :
 				if not symbol in selectedSmbol: continue			
 			
 			if symbol == "COM7": symbol = "COM7_" # fix bug for this symbol only
 			
 			current_row = all_data[row]				
-			if symbol in dict: 	# There are symbol data in dictionary
+			if symbol in dict: 						# There are many symbol data in dictionary
 				dict[symbol].append(current_row)	# append new data to old data
 			else: # no symbol data in dictionary
 				dict[symbol] = [current_row]				
@@ -74,22 +74,22 @@ DIR_SEC_CSV = "sec_csv"
 EOD_file = "set-archive_EOD_UPDATE"
 def createSymbolCSV(start_idex, outputPath=DIR_SEC_CSV):
 	eodFiles = getFileNameInDir(EOD_file)	
-	eodFiles = eodFiles[-1 * start_idex:]		# select files latest N days
+	eodFiles = eodFiles[-1 * start_idex:]		# select files at latest N days
 	
 	clearDir(outputPath) # delete old files
 	
 	dataStock  = getStockData(eodFiles)	
-	headers = getHeaderFile(eodFiles)	# Read header of CSV files
+	headers = getHeaderFile(eodFiles)			# Read a header in CSV files
 	columnNames = { index:changeName(value)  for index, value in enumerate(headers)}
 	
-	# write data to csv files seperate file name follow symbol names of security	
+	# write all data to csv files and separate file name be followed by symbol names of securities
 	count = 0
 	for key, allRow in dataStock.items():		
 		df = pd.DataFrame(allRow)
 		df.rename(columns=columnNames, inplace=True) # change column names in data frame: convert from number to symbol names				
 		
 		fileName = "{}.csv".format(join(outputPath, key))		
-		df.to_csv(fileName, index = False) # write data into CSV file (without index)
+		df.to_csv(fileName, index = False) 		# write data into CSV file (without index)
 				
 		if(count%3000 == 0):	# for debug			
 			print("Writing total files : {} ....".format(count))						
@@ -128,7 +128,7 @@ def loadManySymbols(symbols, dates, column_name, base_dir):
 		symbols = np.append(['SET'],symbols)
 
 	for symbol in symbols:
-		# read CSV file path given ticker symbol.
+		# read CSV file path given symbol.
 		csv_file = os.path.join(base_dir, symbol + '.csv'); 
 		df_temp = pd.read_csv(csv_file, index_col='Date',
 			parse_dates=True, usecols=['Date', column_name], na_values=['nan'])
@@ -172,7 +172,7 @@ def plotCandlestick(symbol, dates, title="Selected data"):
 
 from time import gmtime, strftime
 if __name__ == "__main__" :	
-	#Creat CSV for stock symbols		
+	#Create CSV files for securities
 	createSymbolCSV(2000)
 	#currentDateStr = strftime("%Y-%m-%d %H:%M:%S", gmtime())    	
 	startDate = '2017-03-01'
