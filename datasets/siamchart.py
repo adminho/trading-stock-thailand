@@ -69,6 +69,7 @@ def changeName(name):
 		name = name.replace("<DTYYYYMMDD>", "Date")
 	return name
 
+DIR_CURRENT = os.path.dirname(__file__)
 DIR_SEC_CSV = "sec_csv"
 # download: http://siamchart.com/stock/	 (Must register to login)
 EOD_file = "set-archive_EOD_UPDATE"
@@ -76,8 +77,10 @@ def createSymbolCSV(start_idex, outputPath=DIR_SEC_CSV):
 	eodFiles = getFileNameInDir(EOD_file)	
 	eodFiles = eodFiles[-1 * start_idex:]		# select files at latest N days
 	
+	outputPath = join(DIR_CURRENT,outputPath)
 	clearDir(outputPath) # delete old files
 	
+	eodFiles = [ join(DIR_CURRENT,file)  for file in eodFiles]
 	dataStock  = getStockData(eodFiles)	
 	headers = getHeaderFile(eodFiles)			# Read a header in CSV files
 	columnNames = { index:changeName(value)  for index, value in enumerate(headers)}
@@ -104,6 +107,7 @@ def load_OHLCV(symbol, dates,
 	if 'Date' not in column_names:  
 		column_names = np.append(['Date'],column_names)
 		
+	base_dir = join(DIR_CURRENT,base_dir)
 	csv_file = os.path.join(base_dir, "{}.csv".format(symbol)) 
 	df_csv = pd.read_csv(csv_file, index_col='Date',
 		parse_dates=True, usecols=column_names, na_values=['nan'])
@@ -126,7 +130,8 @@ def loadManySymbols(symbols, dates, column_name, base_dir):
 	df = pd.DataFrame(index=dates)	# empty data frame that has indexs as dates
 	if 'SET' not in symbols:  # add SET for reference, if absent
 		symbols = np.append(['SET'],symbols)
-
+        
+	base_dir = join(DIR_CURRENT,base_dir)
 	for symbol in symbols:
 		# read CSV file path given symbol.
 		csv_file = os.path.join(base_dir, symbol + '.csv'); 
@@ -141,8 +146,8 @@ def loadManySymbols(symbols, dates, column_name, base_dir):
 	 
 	return df
 
-def loadPriceData(symbols, dates,  base_dir=DIR_SEC_CSV):
-	return loadManySymbols(symbols, dates, 'Close', base_dir)
+def loadPriceData(symbol_list, dates,  base_dir=DIR_SEC_CSV):
+	return loadManySymbols(symbol_list, dates, 'Close', base_dir)
 	
 # Borrowed code from : http://matplotlib.org/examples/pylab_examples/finance_demo.
 def plotCandlestick(symbol, dates, title="Selected data"):	
@@ -173,21 +178,30 @@ def plotCandlestick(symbol, dates, title="Selected data"):
 from time import gmtime, strftime
 if __name__ == "__main__" :	
 	#Create CSV files for securities
+	print("Create csv files")
 	createSymbolCSV(2000)
+    
 	#currentDateStr = strftime("%Y-%m-%d %H:%M:%S", gmtime())    	
 	startDate = '2017-03-01'
 	endDate = strftime("%Y-%m-%d", gmtime())    
 	dates = pd.date_range(startDate, endDate)
-	df = load_OHLCV("PTT", dates)
+   
+   #load data such as Open, High, Low, Close and Volume 
+	print("Load data: PTT") 
+	df = load_OHLCV("PTT", dates)	
 	print(df.tail())
-    
+   
+   # plot graph of candle stick 
+	print("\nPlot graph: PTT") 
 	plotCandlestick("PTT", dates, title ="PTT symbol")
-	print()
-	
+		
+   # load close prices of many stock 
 	symbols = ["PTT", "AOT", "SCC", "CPALL"]
+	print("\nLoad close prices of:", symbols) 
 	df = loadPriceData(symbols, dates)
 	print(df.tail())
 	
+   # plot graph all close prices	
 	df = df/df.iloc[0,:] # normalized 
 	df.plot()
 	plt.show()
