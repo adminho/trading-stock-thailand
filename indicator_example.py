@@ -1,7 +1,7 @@
 from time import gmtime, strftime
 import matplotlib.pyplot as plt
 import pandas as pd
-import dataset_siamchart as ds
+import datasets.siamchart as ds
 
 # not sure	
 def ema(df, periods=12):
@@ -10,12 +10,12 @@ def ema(df, periods=12):
       return df.ewm(span=periods, adjust=True, min_periods=0, ignore_na=False).mean()
 
 def average_convergence(df, period_low=26, period_fast=12):
-    """ compute the MACD (Moving Average Convergence/Divergence) 
+	""" compute the MACD (Moving Average Convergence/Divergence) 
 	using a fast and slow exponential moving average'    
-    """
-    emaslow = ema(df, period_low)
-    emafast = ema(df, period_fast)
-    return (emaslow, emafast, emafast - emaslow)	
+	"""
+	emaslow = ema(df, period_low)
+	emafast = ema(df, period_fast)
+	return (emaslow, emafast, emafast - emaslow)	
 
 def signal_MACD(df_MACD, periods=9):
 	return ema(df_MACD, periods)
