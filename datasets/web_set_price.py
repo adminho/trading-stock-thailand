@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import urllib
 from bs4 import BeautifulSoup
 import numpy as np
@@ -6,6 +5,7 @@ import pandas as pd
 from os.path import join, exists
 from os import  remove, makedirs
 
+# Example url
 # https://www.set.or.th/set/historicaltrading.do?symbol=BBL&page=2&language=en&country=US&type=trading
 def getTableData(symbol, page=1):
     if page > 3:
@@ -19,8 +19,7 @@ def getTableData(symbol, page=1):
     table_element =soup.find('table', class_='table table-hover table-info')
     return table_element, url_string
 
-def createDataFrame(table_element):
-    #Generate lists
+def createDataFrame(table_element):    
     row_list =[]
     head_list = []
     
@@ -47,7 +46,7 @@ def createDataFrame(table_element):
     return df
 
 def create_all_data(symbol, total_page=1):
-    # get stock data from set.or.th web (total_page)
+    # get stock data from set.or.th web (total page)
     df = None
     for p in range(1, total_page+1):
         table_element, url_string = getTableData(symbol, page=p) 
@@ -78,11 +77,6 @@ if __name__ == "__main__" :
         print('\n********* %s **********' % symbol)        
         print(df.tail())
         
-        # save csv file (all stock data)
-        removeOldFile(symbol) # clear old
+        # save csv files (all stock data)
+        removeOldFile(symbol) # clear old files
         writeCSVFile(df, symbol)
-
-#For test
-#table_element, url_string = getTableData("PTT") 
-#tr_list = table_element.findAll('tr') 
-#print(tr_list[0:2])   
