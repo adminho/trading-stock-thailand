@@ -39,13 +39,13 @@ def saveTrainedModel(model, jsonFile, h5File):
 	with open(jsonFile, "w") as json_file:
 		json_file.write(model_json)		
 	# serialize weights to HDF5
-	model.save_weights(h5File)
-	print("Saved model to disk %s and %s" % (jsonFile, h5File))
+	model.save_weights(h5File, overwrite=True)
+	print("Saved model to disk: %s and %s" % (jsonFile, h5File))
 
 def encoded(predicted):
 	return (predicted > 0.5) *1
 	
-def getSignal(pevious, current, future):	
+def get_buy_sell(pevious, current, future):	
 	if future == 1: # has uptrend in the 14 days ahead
 		if pevious == 1 and current == 1:
 			return 1 # confrim singal as buy
@@ -58,6 +58,14 @@ def getSignal(pevious, current, future):
 		else:
 			return current # not conrim
 			
+def getSignal(Ydigits):
+	signal = np.copy(Ydigits)	
+	for index in range(1, len(Ydigits)-1):
+		previous = Ydigits[index-1]
+		current = Ydigits[index]
+		future = Ydigits[index+1]
+		signal[index+1] = get_buy_sell(previous, current, future) # future		
+	return np.reshape(signal,(-1,1))
 
 # Borrowed code: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/udacity/1_notmnist.ipynb
 url = 'http://siamchart.com/stock/download.php'
