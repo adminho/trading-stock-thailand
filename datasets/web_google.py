@@ -45,7 +45,7 @@ def createDataFrame(table_element):
                 row_list.append(r.find(text=True).replace('\n',''))
     
     num_col = len(head_list)            
-    shape_row = len(row_list)/num_col
+    shape_row = int(len(row_list)/num_col)
     row_list = np.reshape(row_list, (shape_row,num_col)) 
     df=pd.DataFrame(columns = head_list, data = row_list)
     return df
