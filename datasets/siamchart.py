@@ -5,12 +5,17 @@ import numpy as np
 import pandas as pd
 import shutil	
 
-
 import matplotlib.pyplot as plt
 from matplotlib.finance import date2num
 from matplotlib.dates import DateFormatter, WeekdayLocator,DayLocator, MONDAY
 from matplotlib.finance import candlestick_ohlc
 
+from tqdm import tqdm
+
+# Requirement
+# 1) install Anaconda: https://www.continuum.io/downloads
+# 2) pip install tqdm
+# 3) download EOD file: http://siamchart.com/stock/	 (Must register to login)
 
 def getFileNameInDir(path):
 	onlyFiles = [ join(path,f) for f in listdir(path) if isfile(join(path, f)) ]
@@ -23,19 +28,21 @@ def getHeaderFile(eodFiles):
 		
 def getStockData(eodFiles, selectedSmbol = []):			
 	dict = {}	# empty dictionary
-	
-	for i, f in enumerate(eodFiles):# read all file		
+		
+	totalFiles = len(eodFiles)
+	for i in tqdm(range(totalFiles), ascii=True, desc='Reading EOD files'):	
+		f = eodFiles[i]
 		df = pd.read_csv(f)
 		total_row = len(df.index)	
 		all_data = df.values;
 				
 		#range(start, stop, step)
-		for row in range(total_row-1, -1, -1):	# reverse form range(0, total_row)
-			symbol = all_data[row][0]			# name of stock in the first column
+		for row in range(total_row-1, -1, -1):		# reverse form range(0, total_row)
+			symbol = all_data[row][0]				# name of stock in the first column
 			if len(selectedSmbol)!=0 :
 				if not symbol in selectedSmbol: continue			
 			
-			if symbol == "COM7": symbol = "COM7_" # fix bug for this symbol only
+			if symbol == "COM7": symbol = "COM7_" 	# fix bug for this symbol only
 			
 			current_row = all_data[row]				
 			if symbol in dict: 						# There are many symbol data in dictionary
@@ -43,15 +50,11 @@ def getStockData(eodFiles, selectedSmbol = []):
 			else: # no symbol data in dictionary
 				dict[symbol] = [current_row]				
 		
-		if(i%500 == 0):	# for debug			
-			print("Reading total files : {} ....".format(i))						
-		
 	return dict
 
 def clearDir(dirPath):
 	if exists(dirPath):			
-		shutil.rmtree(dirPath)
-	
+		shutil.rmtree(dirPath)	
 	makedirs(dirPath)	
 
 def changeName(name):
@@ -71,8 +74,9 @@ def changeName(name):
 
 DIR_CURRENT = os.path.dirname(__file__)
 DIR_SEC_CSV = "sec_csv"
+
 # download: http://siamchart.com/stock/	 (Must register to login)
-EOD_file = "set-archive_EOD_UPDATE"
+EOD_file = "D:/MyProject/Big-datasets/data_stock/set-archive_EOD_UPDATE"
 def createSymbolCSV(start_idex, outputPath=DIR_SEC_CSV):
 	eodFiles = getFileNameInDir(EOD_file)	
 	eodFiles = eodFiles[-1 * start_idex:]		# select files at latest N days
@@ -85,19 +89,17 @@ def createSymbolCSV(start_idex, outputPath=DIR_SEC_CSV):
 	headers = getHeaderFile(eodFiles)			# Read a header in CSV files
 	columnNames = { index:changeName(value)  for index, value in enumerate(headers)}
 	
-	# write all data to csv files and separate file name be followed by symbol names of securities
-	count = 0
-	for key, allRow in dataStock.items():		
+	# write all data to csv files and separate file name be followed by symbol names of securities		
+	itemList = list(dataStock.items())
+	allItem = len(itemList)
+	assert allItem == len(dataStock.items())	
+	for i in tqdm(range(allItem), ascii=True, desc='Writing CSV files'):
+		key, allRow = itemList[i]
 		df = pd.DataFrame(allRow)
 		df.rename(columns=columnNames, inplace=True) # change column names in data frame: convert from number to symbol names				
-		
 		fileName = "{}.csv".format(join(outputPath, key))		
-		df.to_csv(fileName, index = False) 		# write data into CSV file (without index)
-				
-		if(count%3000 == 0):	# for debug			
-			print("Writing total files : {} ....".format(count))						
-		count+=1;
-
+		df.to_csv(fileName, index = False) 		# write data into CSV file (without index)				
+		
 def load_OHLCV(symbol, dates, 
 					column_names=['Open', 'High', 'Low', 'Close', 'Volume'],  
 					base_dir=DIR_SEC_CSV):
@@ -178,7 +180,10 @@ def plotCandlestick(symbol, dates, title="Selected data"):
 from time import gmtime, strftime
 if __name__ == "__main__" :	
 	#Create CSV files for securities
-	print("Create csv files")
+	print()
+	print("----------------------------------------------")
+	print("-------------Creating csv files---------------")
+	print("----------------------------------------------")
 	createSymbolCSV(2000)
     
 	#currentDateStr = strftime("%Y-%m-%d %H:%M:%S", gmtime())    	
