@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<style>
+p {
+  text-align: center;
+  font-size: 30px;
+}
+<!--
+img { 
+	width="300px";
+	height="400px";
+}-->
+div {
+	text-align: center;
+}
+</style>
+</head>
+<body>
+<p id="text1">AI trading .....</P>
+<div><h3 id="gain"></h3></div>
+<div><img id="image" ></div>
+<script>
+var index = 0
+// Example:
+// var listImage = ['temp_pic/BBL_0.png', 'temp_pic/BBL_1.png', 'temp_pic/BBL_2.png'];
+var listGain = %s;
+var listImage = %s;
+var x = setInterval(function() {    
+   var gain = document.getElementById('gain');
+   var img = document.getElementById('image');	
+   if (index < listImage.length){		
+		img.src = listImage[index];
+		document.getElementById('text1').innerHTML = 'Iterator: ' + index
+		document.getElementById('gain').innerHTML = 'Capital gain = ' + listGain[index];
+		index++
+	} else {
+		clearInterval(x);
+		document.getElementById('text1').innerHTML = 'Finish!!' + ' (Iterator:' + index +')';
+	}    
+}, 1000);
+</script>
+
+</body>
+</html>
