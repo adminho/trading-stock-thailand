@@ -6,7 +6,8 @@ import shutil
 import numpy as np
 import pandas as pd
 from pandas_datareader import data as pdr
-
+# Requirement 
+# pip install fix_yahoo_finance
 import fix_yahoo_finance as yf # <== that's all it takes :-)
 
 import matplotlib.pyplot as plt
@@ -15,7 +16,10 @@ from matplotlib.dates import DateFormatter, WeekdayLocator,DayLocator, MONDAY
 from matplotlib.finance import candlestick_ohlc
 
 def load_OHLCV(symbol, startdate, enddate):
-    return pdr.get_data_yahoo(symbol+".BK", start=startdate, end=enddate)
+	df = pdr.get_data_yahoo(symbol+".BK", start=startdate, end=enddate)	
+	columnNames = { value:value.upper()  for value in df.columns}
+	df.rename(columns=columnNames, inplace=True)
+	return df
 
 # I think doesn't work
 def loadStockQuotes(symbol, startdate, enddate):
@@ -46,21 +50,21 @@ def selectColumn(all_data, column_name):
         if df is None:
             df = df_temp
         else:
-        	  df = df.join(df_temp, how="outer") # outer join by default
+            df = df.join(df_temp, how="outer") # outer join by default
     return df
     
 def loadPriceData(symbol_list, startdate, enddate):
     all_data = loadBigData(symbol_list, startdate, enddate)     
-    return selectColumn(all_data, 'Adj Close')
+    return selectColumn(all_data, 'ADJ CLOSE')
 
 # Borrowed code from : http://matplotlib.org/examples/pylab_examples/finance_demo.
 def plotCandlestick(symbol, startdate, enddate, title="Selected data"):	
 	quotes = loadStockQuotes(symbol, startdate, enddate)		
-	print(quotes)
+    print(quotes)
 	mondays = WeekdayLocator(MONDAY)        # major ticks on the mondays
 	alldays = DayLocator()              	# minor ticks on the days
 	weekFormatter = DateFormatter('%b %d')  # e.g., Jan 12
-	dayFormatter = DateFormatter('%d')      # e.g., 12
+#	dayFormatter = DateFormatter('%d')      # e.g., 12
 
 	fig, ax = plt.subplots()
 	fig.subplots_adjust(bottom=0.2)
@@ -113,7 +117,7 @@ if __name__ == "__main__":
     all_data = loadBigData(symbols, startDate, endDate)    
     print(all_data)
     
-    adj_close = all_data[['Adj Close']]
+    adj_close = all_data[['ADJ CLOSE']]
     print(adj_close)
     
     # plot graph of candle stick 
@@ -123,7 +127,9 @@ if __name__ == "__main__":
     # load Adj Close of many stock 	
     print("\nLoad adjusted closing price of:", symbols) 
     df = loadPriceData(symbols, startDate, endDate)
-    print(df.tail())
+    df.fillna(method='ffill', inplace=True)
+    df.fillna(method='bfill', inplace=True)
+    print(df.tail())    
     
     # plot graph all close prices	
     df = df/df.iloc[0,:] # normalized 
