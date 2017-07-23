@@ -30,10 +30,24 @@ And you can also install Keras from PyPI with the command
 
 `pip install keras`
 
-* Install tqdm to make my loops show a smart progress meter 
+* Install tqdm to make my loops show a smart progress meter on console
 
 `pip install tqdm`
 
+
 ## My source codes
 
-In [LSTM_predict_trend.py](LSTM_predict_trend.py) file, I'm trying to apply Deep Learning (LSTM network) to predict a stock trend (Not complete)
+
+[LSTM_predict_trend.py](LSTM_predict_trend.py) 
+
+I'm trying to apply Deep Learning (LSTM network) to predict a stock trend (Not complete)
+
+
+[BOT_API_example.py](BOT_API_example.py)
+
+Since Bank of Thailand (BOT) has provided [21 APIs](https://iapi.bot.or.th/Developer?lang=th) for query data including Exchange rate, Interest Rate and Debt securities auction so I would like to show examples howto use 2 APIs such as
+- Daily Weighted-average Interbank Exchange Rate - THB / USD
+- Daily Average Exchange Rate - THB / Foreign Currency
+
+For example code in HTML/JavaScript, I shared at [here](https://gist.github.com/adminho/0159bb53c02bfdee1c4c31de3d8ecd92)
+
