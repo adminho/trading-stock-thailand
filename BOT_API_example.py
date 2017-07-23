@@ -177,7 +177,7 @@ def _df_DAILY_AVG_EXG_RATE(data_detail):
 	return df
 
 """
-ต้องทำคล้ายๆ  _df_DAILY_AVG_EXG_RATE มันมี interest rate หลายประเภท
+วางแผนว่าจะทำคล้ายๆ  _df_DAILY_AVG_EXG_RATE เนื่องจากมันมี interest rate หลายประเภท
 def _df_THB_IMPL_INT_RATE(data_detail):
 	date_list, interest_list = [], []
 	for value in data_detail:			
@@ -261,8 +261,8 @@ def get_THB_IMPL_INT_RATE(startDate, endDate):
 							_df_THB_IMPL_INT_RATE)					
 """
 
-# ปัญหาแต่ละ พารามิเตอร์ วันนที่ต่างกัน ถ้าหาอัตราแลกเปลี่ยนรายเดือน ก็ไม่จำเป็นต้องมีวันที่
-# ผมเลยเลือกทำเฉพาะ API ที่เป็นรายวันแทนไงละ
+# ปัญหาแต่ละ API ต้องการพารามิเตอร์ที่แตกต่างกัน
+# ผมเลยเลือกทำ API แค่ 2 ตัวก่อน
 
 startDate = '2017-03-01'
 endDate = strftime("%Y-%m-%d", gmtime())    
