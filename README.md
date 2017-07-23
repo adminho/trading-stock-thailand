@@ -32,7 +32,7 @@ Download datasets (EOD data files from SET)
 
 ### 1) [LSTM_predict_trend.py](LSTM_predict_trend.py) 
 
-I'm trying to apply Deep Learning (LSTM network) to predict a stock trend (Not complete)
+I'm trying to apply Deep Learning (LSTM network) to predict a stock trend (not complete)
 
 
 ### 2) [BOT_API_example.py](BOT_API_example.py)
@@ -53,7 +53,7 @@ There are my examples to compute the technical indicators for securities includi
 
 ### 4) [DeepQ_trade.py](DeepQ_trade.py)
 
-I'm trying to apply Deep Q-learning (Reinforcement Learning) to automatic trading (Not complete)
+I'm trying to apply Deep Q-learning (Reinforcement Learning) to automatic trading (not complete)
 
 
 ## Credit 
