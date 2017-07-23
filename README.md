@@ -48,8 +48,8 @@ For example code in HTML/JavaScript, I shared at [here](https://gist.github.com/
 
 There are my examples to compute the technical indicators for securities including
 
-`ROC, Bollinger Band (BBANDS), daily returns, SMA, EMA, MACD, MACD signal,  RSI, Sharpe ratio,True Range (TR), ATR, Beta, K% D%
-OBV, compute capital gain and etc`
+`ROC, Bollinger Band (BBANDS), daily returns, SMA, EMA, MACD, MACD signal, RSI, Sharpe ratio,True Range (TR), ATR, Beta, K% D%
+, OBV, compute capital gain and etc`
 
 
 ### 4) [DeepQ_trade.py](DeepQ_trade.py)
