@@ -68,7 +68,7 @@ There are my examples to compute the technical indicators for securities includi
 I'm trying to apply Deep Q-learning (Reinforcement Learning) to automatic trading (not complete)
 
 
-## Credit 
+## Thank you
 
 I Borrowed some codes from
 
