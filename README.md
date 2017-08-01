@@ -53,7 +53,7 @@ There are my examples to compute the technical indicators for securities includi
 * daily returns
 * [SMA, EMA](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_averages)
 * [MACD, MACD signal](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_average_convergence_divergence_macd)
-* [RSI](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi),\
+* [RSI](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi)
 * [Sharpe ratio](http://www.investopedia.com/terms/s/sharperatio.asp?lgl=rira-baseline-vertical)
 * [True Range (TR)](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_true_range_atr)
 * [ATR](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_true_range_atr)
