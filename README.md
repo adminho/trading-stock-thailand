@@ -48,8 +48,20 @@ For example code in HTML/JavaScript, I shared at [here](https://gist.github.com/
 
 There are my examples to compute the technical indicators for securities including
 
-`ROC, Bollinger Band (BBANDS), daily returns, SMA, EMA, MACD, MACD signal, RSI, Sharpe ratio,True Range (TR), ATR, Beta, K% D%
-, OBV, compute gain and etc`
+* [ROC](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:rate_of_change_roc_and_momentum)
+* [Bollinger Band (BBANDS)](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:bollinger_bands)
+* daily returns
+* [SMA, EMA](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_averages)
+* [MACD, MACD signal](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_average_convergence_divergence_macd)
+* [RSI](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi),\
+* [Sharpe ratio](http://www.investopedia.com/terms/s/sharperatio.asp?lgl=rira-baseline-vertical)
+* [True Range (TR)](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_true_range_atr)
+* [ATR](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_true_range_atr)
+* [Beta](http://www.investopedia.com/terms/b/beta.asp?lgl=rira-baseline-vertical)
+* [K%, D%](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:stochastic_oscillator_fast_slow_and_full)
+* [OBV](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:on_balance_volume_obv)
+* compute gain 
+* and etc
 
 
 ### 4) [DeepQ_trade.py](DeepQ_trade.py)
