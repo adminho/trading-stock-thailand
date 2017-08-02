@@ -85,3 +85,7 @@ I Borrowed some codes from
 * https://www.udacity.com/course/machine-learning-for-trading--ud501
 * http://matplotlib.org/examples/pylab_examples/finance_demo.
 
+## Knowledge
+
+* https://www.udacity.com/course/machine-learning-for-trading--ud501
+* https://www.datacamp.com/community/tutorials/finance-python-trading
