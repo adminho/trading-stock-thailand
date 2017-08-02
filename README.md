@@ -17,7 +17,7 @@ And you can also install Keras from PyPI with the command
 
 `pip install keras`
 
-* Install pandas_datareader to get data from [https://finance.yahoo.com/](https://finance.yahoo.com/) and also install fix_yahoo_finance
+* Install pandas_datareader to get data from [https://finance.yahoo.com/](https://finance.yahoo.com/) and also install fix_yahoo_finance (fix bugs).
 
 `pip install pandas_datareader`
 
