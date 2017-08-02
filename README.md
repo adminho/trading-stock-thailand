@@ -17,6 +17,11 @@ And you can also install Keras from PyPI with the command
 
 `pip install keras`
 
+* Install pandas_datareader to get data from [https://finance.yahoo.com/](https://finance.yahoo.com/) and also install fix_yahoo_finance
+
+`pip install pandas_datareader
+pip install fix_yahoo_finance`
+
 * Install tqdm to make my loops show a smart progress meter on console
 
 `pip install tqdm`
