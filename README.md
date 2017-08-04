@@ -1,4 +1,4 @@
-The project will be updated continuously ......  
+The project will be updated continuously ......  :fire:
 
 # Trading example codes (not yet)
 
