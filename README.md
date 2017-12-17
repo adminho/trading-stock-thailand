@@ -4,7 +4,7 @@ This repository collects my example codes in Python for studing in [The Stock Ex
 
 ## Requirement
 
-All examples are written in Python language, so you need to setup your environments as below 
+All examples are written in Python language, so you need to setup your environments as below
 
 * First, install [ANACONDA](https://www.continuum.io/downloads)
 * For Deep learning, I used 2 library including TensorFlow and Keras
@@ -30,7 +30,7 @@ Download datasets (EOD data files from SET)
 ## My source codes
 
 
-### 1) [LSTM_predict_trend.py](LSTM_predict_trend.py) 
+### 1) [LSTM_predict_trend.py](LSTM_predict_trend.py)
 
 I'm trying to apply Deep Learning (LSTM network) to predict a stock trend (not complete)
 
@@ -41,10 +41,13 @@ Since Bank of Thailand (BOT) has provided [21 APIs](https://iapi.bot.or.th/Devel
 - Daily Weighted-average Interbank Exchange Rate - THB / USD
 - Daily Average Exchange Rate - THB / Foreign Currency
 
-For example code in HTML/JavaScript, I shared at [here](https://gist.github.com/adminho/0159bb53c02bfdee1c4c31de3d8ecd92)
+For example code in HTML/JavaScript, JavaScript with Node.js and Python, I shared at [here](https://gist.github.com/adminho/0159bb53c02bfdee1c4c31de3d8ecd92)
 
+![image bot api](images/test_bot_api.PNG)
 
-### 3) [indicator.py](indicator.py) 
+__Example codes for "Daily Weighted-average Interbank Exchange Rate - THB / USD"__
+
+### 3) [indicator.py](indicator.py)
 
 There are my examples to compute the technical indicators for securities including
 
@@ -56,7 +59,7 @@ There are my examples to compute the technical indicators for securities includi
 I'm trying to apply Deep Q-learning (Reinforcement Learning) to automatic trading (not complete)
 
 
-## Credit 
+## Credit
 
 I Borrowed some codes from
 
