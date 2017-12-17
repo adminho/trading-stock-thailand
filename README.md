@@ -53,11 +53,11 @@ Since Bank of Thailand (BOT) has provided [21 APIs](https://iapi.bot.or.th/Devel
 - Daily Weighted-average Interbank Exchange Rate - THB / USD
 - Daily Average Exchange Rate - THB / Foreign Currency
 
-For example code in HTML/JavaScript, JavaScript with Node.js and Python, I shared at [here](https://gist.github.com/adminho/0159bb53c02bfdee1c4c31de3d8ecd92)
+For example codes in HTML/JavaScript, JavaScript with Node.js and Python, I shared at [here](https://gist.github.com/adminho/0159bb53c02bfdee1c4c31de3d8ecd92)
 
 ![image bot api](images/test_bot_api.PNG)
 
-_Example API for "Daily Weighted-average Interbank Exchange Rate - THB / USD"_
+_An example when using "Daily Weighted-average Interbank Exchange Rate - THB / USD" API_
 
 
 ### 3) [indicator.py](indicator.py) 
