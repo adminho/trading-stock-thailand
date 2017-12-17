@@ -61,7 +61,7 @@ def plotCandlestick(symbol, start_index, end_index, title="Selected data"):
 
 	plt.show()
 	
-def plotLine(data):	
+def plotHistory(data):
 	plt.figure(figsize=(6, 3))
 	plt.plot(data)
 	plt.ylabel('error')
@@ -77,7 +77,7 @@ def _plotColorLine(close, Ydigit, ax):
 	ax.plot(red.index, red.values, '-r',  green.index, green.values,'-g')	
 	ax.legend(['Not', 'predict new high'])
 			
-def plot1ColLine(symbol, close, Ydigit, title):
+def plot1ColLine(close, Ydigit, title):
 	_plotColorLine(close, Ydigit, plt)	
 	plt.title(title)
 	plt.xlabel('Dates')

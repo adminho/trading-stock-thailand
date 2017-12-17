@@ -59,17 +59,18 @@ def clearDir(dirPath):
 
 def changeName(name):
 	"""
-	I change this column name ["<OPEN>", "<HIGH>", "<LOW>", "<CLOSE>", "<VOL>"] 
-	to [Open, High, Low, Close, Volume]  same yahoo finance
+	I change this column name ["<OPEN>", "<HIGH>", "<LOW>", "<CLOSE>", "<VOL>"] 	
 	"""
 	if name in ["<OPEN>", "<HIGH>", "<LOW>", "<CLOSE>"]:
 		# Frist charector is upper case
 		name = name.replace('<', '').replace('>', '')
-		name = name[0] + name[1:].lower()
+		#name = name[0] + name[1:].lower()		
 	elif name in ["<VOL>"]:
-		name = name.replace("<VOL>", "Volume")
+		#name = name.replace("<VOL>", "Volume")
+		name = name.replace("<VOL>", "VOLUME")
 	elif name in ["<DTYYYYMMDD>"]:
-		name = name.replace("<DTYYYYMMDD>", "Date")
+		#name = name.replace("<DTYYYYMMDD>", "Date")
+		name = name.replace("<DTYYYYMMDD>", "DATE")
 	return name
 
 DIR_CURRENT = os.path.dirname(__file__)
@@ -86,7 +87,7 @@ def createSymbolCSV(start_idex, outputPath=DIR_SEC_CSV):
 	
 	eodFiles = [ join(DIR_CURRENT,file)  for file in eodFiles]
 	dataStock  = getStockData(eodFiles)	
-	headers = getHeaderFile(eodFiles)			# Read a header in CSV files
+	headers = getHeaderFile(eodFiles)			# Read a header in CSV files		
 	columnNames = { index:changeName(value)  for index, value in enumerate(headers)}
 	
 	# write all data to csv files and separate file name be followed by symbol names of securities		
@@ -97,29 +98,38 @@ def createSymbolCSV(start_idex, outputPath=DIR_SEC_CSV):
 		key, allRow = itemList[i]
 		df = pd.DataFrame(allRow)
 		df.rename(columns=columnNames, inplace=True) # change column names in data frame: convert from number to symbol names				
+		df.drop('<TICKER>', axis=1, inplace=True) # remove column
 		fileName = "{}.csv".format(join(outputPath, key))		
 		df.to_csv(fileName, index = False) 		# write data into CSV file (without index)				
 		
-def load_OHLCV(symbol, dates, 
-					column_names=['Open', 'High', 'Low', 'Close', 'Volume'],  
+def load_OHLCV(symbol, dates=None, 
+					#column_names=['Open', 'High', 'Low', 'Close', 'Volume'],  
+					column_names=['OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'],  
 					base_dir=DIR_SEC_CSV):
-	"""Read securities data for given symbols from CSV files."""
-	df_main = pd.DataFrame(index=dates)	# empty data frame that has indexs as dates
 	
-	if 'Date' not in column_names:  
-		column_names = np.append(['Date'],column_names)
+	#if 'Date' not in column_names:  
+	#	column_names = np.append(['Date'],column_names)
+	if 'DATE' not in column_names:  
+		column_names = np.append(['DATE'],column_names)
 		
 	base_dir = join(DIR_CURRENT,base_dir)
 	csv_file = os.path.join(base_dir, "{}.csv".format(symbol)) 
-	df_csv = pd.read_csv(csv_file, index_col='Date',
+	# df_csv = pd.read_csv(csv_file, index_col='Date',
+	df_csv = pd.read_csv(csv_file, index_col='DATE',
 		parse_dates=True, usecols=column_names, na_values=['nan'])
+	
+	"""Read securities data for given symbols from CSV files."""
+	if dates is None:
+		dates = df_csv.index
+	df_main = pd.DataFrame(index=dates)	# empty data frame that has indexs as dates
 	
 	df_main = df_main.join(df_csv)
 	df_main = df_main.dropna(0)	
 	return df_main
 
 def loadStockQuotes(symbol, dates):
-	col_names=['Open', 'Close', 'High', 'Low']	
+	#col_names=['Open', 'Close', 'High', 'Low']	
+	col_names = ['OPEN', 'HIGH', 'LOW', 'CLOSE']
 	df = load_OHLCV(symbol, dates, column_names=col_names, base_dir=DIR_SEC_CSV)
 	
 	#quotes = [ (date, open, close, high, low), .....]
@@ -137,8 +147,10 @@ def loadManySymbols(symbols, dates, column_name, base_dir):
 	for symbol in symbols:
 		# read CSV file path given symbol.
 		csv_file = os.path.join(base_dir, symbol + '.csv'); 
-		df_temp = pd.read_csv(csv_file, index_col='Date',
-			parse_dates=True, usecols=['Date', column_name], na_values=['nan'])
+		#df_temp = pd.read_csv(csv_file, index_col='Date',		
+			#parse_dates=True, usecols=['Date', column_name], na_values=['nan'])
+		df_temp = pd.read_csv(csv_file, index_col='DATE',
+			parse_dates=True, usecols=['DATE', column_name], na_values=['nan'])
 		
 		df_temp = df_temp.rename(columns={column_name: symbol})
 		df = df.join(df_temp) # left join by default
@@ -149,7 +161,8 @@ def loadManySymbols(symbols, dates, column_name, base_dir):
 	return df
 
 def loadPriceData(symbol_list, dates,  base_dir=DIR_SEC_CSV):
-	return loadManySymbols(symbol_list, dates, 'Close', base_dir)
+	#return loadManySymbols(symbol_list, dates, 'Close', base_dir)
+	return loadManySymbols(symbol_list, dates, 'CLOSE', base_dir)
 	
 # Borrowed code from : http://matplotlib.org/examples/pylab_examples/finance_demo.
 def plotCandlestick(symbol, dates, title="Selected data"):	

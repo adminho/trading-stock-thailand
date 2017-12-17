@@ -1,3 +1,4 @@
+import os
 from os import listdir, makedirs, remove
 from os.path import isfile, join, exists
 import numpy as np
@@ -49,7 +50,7 @@ def clearDir(dirPath):
 	
 	makedirs(dirPath)	
 
-DIR_SEC_CSV = "sec_csv"
+DIR_SEC_CSV = "datasets/sec_csv"
 # download: http://siamchart.com/stock/			
 EOD_file = "set-archive_EOD_UPDATE"
 def createSymbolCSV(start_idex, outputPath=DIR_SEC_CSV):

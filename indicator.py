@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 
 def roc(df_close, periods=12):	
-	# Close - Close n periods ago, change_n_period_ago = df_close - df_close.shift(periods)
+	# Close - Close n periods ago
+	# change_n_period_ago = df_close - df_close.shift(periods)
 	change_n_period_ago = df_close.diff(periods) 
 	# Close n periods ago
 	close_n_period_ago = df_close.shift(periods)
@@ -56,11 +57,11 @@ def daily_returns(df):
 	# (current_price / previous_price) -1
 	# daily_returns = (df / df.shift(1)) - 1
 	daily_returns = df.pct_change(); 
-	daily_returns.ix[0] = 0
+	daily_returns.iloc[0] = 0
 		    
 	return daily_returns
 
-def daily_returns_2(df):
+def close_2_open(df):
 	"""Compute and return the daily return values."""
 	# from pervious close to current open close
 	# (current_open_price / previous_close_price) -1	
@@ -68,18 +69,20 @@ def daily_returns_2(df):
 	previos_close = df['CLOSE'].shift(1)
 	daily_returns_2 = (current_open/ previos_close) - 1
 	#daily_returns = df.pct_change(); 
-	#daily_returns_2.ix[0] = 0		    		
+	#daily_returns_2.iloc[0] = 0		    		
 	return pd.DataFrame(daily_returns_2, columns=['C2O'])
 	
 def	BBANDS(df_price, periods=20, mul=2):	
 	# Middle Band = 20-day simple moving average (SMA)
 	df_middle_band = pd.rolling_mean(df_price, window=periods)
+	#df_middle_band = pd.rolling(window=periods,center=False).mean()
 	
 	# 20-day standard deviation of price
 	""" Pandas uses the unbiased estimator (N-1 in the denominator), 
 	whereas Numpy by default does not.
 	To make them behave the same, pass ddof=1 to numpy.std()."""	
 	df_std = pd.rolling_std(df_price, window=periods)
+	#df_std = pd.rolling(window=periods,center=False).std()
 	
 	# Upper Band = 20-day SMA + (20-day standard deviation of price x 2)
 	df_upper_band = df_middle_band + (df_std * mul)
@@ -89,8 +92,8 @@ def	BBANDS(df_price, periods=20, mul=2):
 	
 	return (df_upper_band, df_middle_band, df_lower_band)
 
-def get_BBANDS(df, symbol, periods=20, mul=2):	
-	(upper, middle, lower) = BBANDS(df[symbol], periods, mul)		
+def get_BBANDS(df, periods=20, mul=2):	
+	(upper, middle, lower) = BBANDS(df, periods, mul)		
 	df_BBANDS = pd.concat([upper, middle, lower], axis=1, join='inner')
 	df_BBANDS.columns = ['UPPER', 'MIDDLE', 'LOWER']
 	return df_BBANDS
@@ -109,12 +112,6 @@ def get_myRatio(df_price, periods=20):
 	
 	return (df_price - df_middle_band)/(df_std * 2)
 
-def diff_BBANDS(df_price, periods=20):		
-	(upper, middle, lower) = BBANDS(df_price, periods)	
-	return (df_price - upper
-			, df_price - middle
-			, df_price - lower)
-			
 def sma(df, periods=12):
 	# compute simple moving average
 	#return pd.rolling_mean(df, window=periods)	
@@ -124,7 +121,7 @@ def sma(df, periods=12):
 def ema(df, periods=12):
 	# compute exponential moving average
 	#return pd.ewma(df, span = periods)
-      return df.ewm(span=periods, adjust=True, min_periods=0, ignore_na=False).mean()
+	return df.ewm(span=periods, adjust=True, min_periods=0, ignore_na=False).mean()
 
 def average_convergence(df, period_low=26, period_fast=12):
     """
@@ -142,7 +139,7 @@ def rsi(df):
 	periods=14
 	# Price change,	df_change = df - df.shift(1)
 	df_change = df.diff(1)			
-		
+	
 	df_gain = df_change.where(df_change > 0) 		# Gain
 	df_loss = -1 * df_change.where(df_change < 0) 	# loss, multiple -1 to positive values
 	df_gain.fillna(0, inplace=True) 				# fill NaN to 0
@@ -152,15 +149,15 @@ def rsi(df):
 	df_avg_gain = pd.DataFrame(columns = df.columns, index = df.index)
 	df_avg_loss = df_avg_gain.copy()
 		
-	df_avg_gain.ix[periods] = df_gain[1:periods+1].mean()	# First Average Gain = Sum of Gains over the past 14 periods / 14.
-	df_avg_loss.ix[periods] = df_loss[1:periods+1].mean()	# First Average Loss = Sum of Losses over the past 14 periods / 14
+	df_avg_gain.iloc[periods] = df_gain[1:periods+1].mean()	# First Average Gain = Sum of Gains over the past 14 periods / 14.
+	df_avg_loss.iloc[periods] = df_loss[1:periods+1].mean()	# First Average Loss = Sum of Losses over the past 14 periods / 14
 	
 	for index in range(periods+1, len(df)):
 		#Average Gain = [(previous Average Gain) x 13 + current Gain] / 14.	
-		df_avg_gain.ix[index] = (df_avg_gain.ix[index-1] * 13 + df_gain.ix[index])/periods
+		df_avg_gain.iloc[index] = (df_avg_gain.iloc[index-1] * 13 + df_gain.iloc[index])/periods
 		
 		#Average Loss = [(previous Average Loss) x 13 + current Loss] / 14.
-		df_avg_loss.ix[index] =	(df_avg_loss.ix[index-1] * 13 + df_loss.ix[index])/periods
+		df_avg_loss.iloc[index] =	(df_avg_loss.iloc[index-1] * 13 + df_loss.iloc[index])/periods
 
 	# RS = Average Gain / Average Loss	
 	# if coding as bellow, it has a bug when df_avg_loss is zero (can't divid with zero)
@@ -168,12 +165,12 @@ def rsi(df):
 	# But I change coding with for loop instead
 	RS = pd.DataFrame(columns = df.columns, index = df.index)
 	for index in RS.index:		
-		for sym in df.columns:
-			lossValue = df_avg_loss.ix[index][sym]
+		for sym in df.columns:			
+			lossValue = df_avg_loss.loc[index][sym]
 			if lossValue == 0:
-				RS.ix[index][sym] = 100
+				RS.loc[index][sym] = 100
 			else:	
-				RS.ix[index][sym] = df_avg_gain.ix[index][sym]/lossValue			
+				RS.loc[index][sym] = df_avg_gain.loc[index][sym]/lossValue			
 		
 	#              100
     # RSI = 100 - --------
@@ -184,7 +181,7 @@ def rsi(df):
 def sharpe_ratio(rp, rf=None):	
 	if rf is None:	
 		rf = rp.copy()
-		rf.ix[0:] = 0
+		rf.iloc[0:] = 0
 		
 	# rp = Expected porfolio return
 	# rf = Risk free rate
@@ -213,15 +210,10 @@ def create_dataframe_SR(df, symbols, window=5):
 		
 	return df_sr
 
-def isStrongSR(df_sr, window=10):
-	df_compare = df_sr > 0					    # Sharpe ratio is more than 0, daily return is pluss 
-	df_sum = pd.rolling_sum(df_compare, window) # Sharpe ratio is more than 0 contiue [window] days
-	return 1* (df_sum==window) 					# True When Sharpe ratio > 10 continually (by default), multiply 1 to convert integer number
-
 def true_range(df):
-	high = df['<HIGH>']
-	low = df['<LOW>']
-	previous_close = df['<CLOSE>'].shift(1)
+	high = df['HIGH']
+	low = df['LOW']
+	previous_close = df['CLOSE'].shift(1)
 	
 	# True Range (TR)
 	# Method 1: Current High less the current Low
@@ -239,15 +231,15 @@ def ATR(df):
 	periods = 14
 	df_TR = true_range(df)	# True range
 	
-	df_ATR = pd.DataFrame(columns = ['<ATR>'], index = df.index)
-	df_ATR.ix[periods-1] = df_TR[0:periods].mean()	# First ATR = Sum of TR over the past 14 periods / 14
+	df_ATR = pd.DataFrame(columns = ['ATR'], index = df.index)
+	df_ATR.iloc[periods-1] = df_TR[0:periods].mean()	# First ATR = Sum of TR over the past 14 periods / 14
 		 
 	for index in range(periods, len(df)):
 		#Current ATR = [(Prior ATR x 13) + Current TR] / 14
 		# - Multiply the previous 14-day ATR by 13.
 		# - Add the most recent day's TR value.
 		# - Divide the total by 14  		
-		df_ATR.ix[index] = (df_ATR.ix[index-1] * 13 + df_TR.ix[index])/periods
+		df_ATR.iloc[index] = (df_ATR.iloc[index-1] * 13 + df_TR.iloc[index])/periods
 			
 	return df_ATR
 
@@ -260,18 +252,6 @@ def getBeta(df, stock_name, benchmark_name):
 	# where rs is the return on the stock and rb is the return on a benchmark index.
 	return rs.cov(rb)/rb.var()	
 
-def listLowBeta(df):
-	betaList = []
-	stockName = df.columns.values[1:] # skip 'SET'
-	for name in stockName:
-		beta = getBeta(df, name, 'SET')
-		betaList = np.append(betaList, beta)
-		
-	indexList= np.argsort(betaList) # index of min values is at first of the queue 
-	symbolBeta = [stockName[index] for index in indexList] 
-	# order symbol names from low Beta to high Beta	
-	return symbolBeta
-
 def percent_KD(df, periods=14):
 	"""
 	%K = (Current Close - Lowest Low)/(Highest High - Lowest Low) * 100
@@ -281,7 +261,12 @@ def percent_KD(df, periods=14):
 	Highest High = highest high for the look-back period
 	%K is multiplied by 100 to move the decimal point two places
 	"""
-	current = df['CLOSE'] # Current Close
+	current = None
+	if "ADJ CLOSE" in df.columns:
+		current = df['ADJ CLOSE']
+	else:
+		current = df['CLOSE'] # Current Close
+		
 	low = df['LOW']	# Lowest Low
 	high = df['HIGH']	# Highest High
 	finish = len(df)-periods + 1
@@ -293,8 +278,8 @@ def percent_KD(df, periods=14):
 		Highest_High = np.max(high[index: index+periods])		
 		Lowest_Low = np.min(low[index: index+periods])
 		position = index + periods - 1
-		current_close = current.ix[position]
-		K_.ix[position] = (current_close - Lowest_Low) /(Highest_High - Lowest_Low) *100
+		current_close = current.iloc[position]
+		K_.iloc[position] = (current_close - Lowest_Low) /(Highest_High - Lowest_Low) *100
 		
 	D_ = sma(K_, periods=3)
 	D_.rename(columns={'%K':'%D'},inplace=True)
@@ -305,7 +290,7 @@ def OBV(df_volume, df_close):
 	# create empty Data Frame
 	df_OBV = pd.DataFrame(index = df_volume.index, columns = df_volume.columns)
 	# first OBV
-	df_OBV.ix[0] = df_volume.ix[0] 
+	df_OBV.iloc[0] = df_volume.iloc[0] 
 		
 	# Price change,	df_price_change = df_close - df_close.shift(1)
 	df_price_change = df_close.diff(1)	
@@ -321,8 +306,8 @@ def OBV(df_volume, df_close):
 			#If the closing prices equals the prior close price then:
 			#Current OBV = Previous OBV (no change)		
 
-			change = df_price_change.ix[index][symbol]
-			current_volume =  df_volume.ix[index][symbol]
+			change = df_price_change.iloc[index][symbol]
+			current_volume =  df_volume.iloc[index][symbol]
 			
 			if change > 0:			
 				current_volume =  current_volume
@@ -333,7 +318,7 @@ def OBV(df_volume, df_close):
 			else:	
 				current_volume = 0
 			
-			df_OBV.ix[index][symbol] = df_OBV.ix[index -1][symbol]  + current_volume
+			df_OBV.iloc[index][symbol] = df_OBV.iloc[index -1][symbol]  + current_volume
 	
 	return df_OBV		
 
@@ -377,33 +362,17 @@ def compare_stock(df, x_stock, y_stock):
 	
 	beta, alpha = np.polyfit(X, Y, 1)
 	print('Beta is {}, Alpha is {}'.format(beta, alpha))
-	print('fx = {}x + {}'.format(beta, alpha))
-	
-	fx = beta*X + alpha	
-	plt.plot(X, fx, 'r-')
-	plt.show()
-
-# I think don't work
-def isProfit(df_price, symbol, periods=14):
-	finish = len(df_price) - periods +1
-	resultDf = pd.DataFrame(columns=[symbol]) # empty
-		
-	for index in range(1, finish):
-		sliced = df_price.ix[index-1: index+periods] # slice n periods					
-		result = create_dataframe_SR(sliced, [symbol], window = periods+1)		
-		result = result.shift(-periods)
-		#result.dropna(0, inplace=True)
-		compare = result.ix[0] > 1
-		resultDf = resultDf.append(compare)	
-	
-	return resultDf
-
+	print('fx = {}x + {}'.format(beta, alpha))	
+	#fx = beta*X + alpha	
+	#plt.plot(X, fx, 'r-')
+	#plt.show()
+ 
 def isUpTrend(df_price , symbol, periods =14):	
 	finish = len(df_price) - periods +1
 	resultDf = pd.DataFrame(columns=df_price.columns) # empty
 	
 	for index in range(1, finish):
-		sliced = df_price.ix[index-1: index+periods] # slice n periods			
+		sliced = df_price.iloc[index-1: index+periods] # slice n periods			
 		# compute RSI
 		result = rsi(pd.DataFrame(sliced, columns=df_price.columns))
 		result = result.shift(-periods)
@@ -413,21 +382,6 @@ def isUpTrend(df_price , symbol, periods =14):
 	
 	return resultDf
 			
-from scipy.stats import linregress
-def fitLine(df_price, periods = 14):	
-	X = np.arange(0, periods)
-	df_slope = pd.DataFrame(index=df_price.index, columns=df_price.columns)
-	df_slope[0:] = float('nan')
-	finish = len(df_price) - periods+1	
-	
-	for sym in df_price.columns:
-		for index in range(0, finish):
-			Y = df_price.ix[index: index+periods][sym]
-			slope, intercept, r, p, stderr = linregress(X, Y)		
-			df_slope.ix[index+periods-1][sym] = slope
-	
-	return df_slope
-
 def listLowVolatility(df):	
 	allDaily = daily_returns(df)
 
@@ -460,8 +414,7 @@ def compute_gain(df, signal):
             if index == df_len - 1 and pred == 1:
                 sum_sell += close
             continue
-    
-        # temp_pred != pred
+           
         temp_pred = pred            
         if pred == 0:        
             sum_sell += close        
@@ -472,5 +425,3 @@ def compute_gain(df, signal):
     # Gain(%) = 100 x Sum(Sell(i) - Buy(i))/Sum(Buy(i))
     gain =  100 * (sum_sell - sum_buy)/sum_buy
     return gain
-  
-

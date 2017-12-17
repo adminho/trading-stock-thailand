@@ -9,13 +9,16 @@ symbol = 'PTT'
 print(json.dumps(getQuotes('SET:' + symbol), indent=2)) # for Stock of Thailand, There is a prefix with 'SET:'
 print()
 
+#http://www.google.com/finance/company_news?output=json&q=GOOG&start=0&num=1000
+
+
 # Second example
 # How to install quandl package
 # https://github.com/quandl/quandl-python
 # pip install quandl
 print("+++++quandl example+++++")
 import quandl
-quandl.ApiConfig.api_key = 'xxxxxxxx' #(must register at https://www.quandl.com/)
+quandl.ApiConfig.api_key = 'hGjH3Bsv8czZQBB515hE' #(must register at https://www.quandl.com/)
 print("THAISE index:")
 data = quandl.get("THAISE/INDEX")
 #data = quandl.get("THAISE/INDEX", authtoken="hGjH3Bsv8czZQBB515hE")

@@ -8,7 +8,7 @@ import pandas as pd
 import pickle
 
 
-startDate = '2017-03-01'
+startDate = '2017-05-01'
 endDate = utl.getCurrentDateStr()
 dates = pd.date_range(startDate, endDate)	
 symbolList = data.getAllSymbol()

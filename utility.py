@@ -41,8 +41,7 @@ def loadStockData(symbols, dates, column_name, base_dir):
 	 
 	return df
 
-default_path="sec_csv"
-
+default_path="datasets/sec_csv"
 def loadPriceData(symbols, dates,  base_dir=default_path):
 	return loadStockData(symbols, dates, '<CLOSE>', base_dir)
 

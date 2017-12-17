@@ -264,22 +264,25 @@ def get_THB_IMPL_INT_RATE(startDate, endDate):
 # ปัญหาแต่ละ API ต้องการพารามิเตอร์ที่แตกต่างกัน
 # ผมเลยเลือกทำ API แค่ 2 ตัวก่อน
 
+def get_AllDailyRate(startDate, endDate):
+	df1 = get_DAILY_REF_RATE(startDate, endDate) 
+	df2 = get_DAILY_AVG_EXG_RATE(startDate, endDate) 
+
+	# for debug
+	df1.to_csv("daily_rate_test.csv")
+	df2.to_csv("daily_avg_exg_rate_test.csv")
+
+	df_merge = df1.join(df2, how="left")
+	df_merge.to_csv("daily_rate_merge_test.csv")
+	return df_merge
+
 startDate = '2017-03-01'
 endDate = strftime("%Y-%m-%d", gmtime())    
-df1 = get_DAILY_REF_RATE(startDate, endDate) 
-df2 = get_DAILY_AVG_EXG_RATE(startDate, endDate) 
-
-# for debug
-df1.to_csv("daily_rate_test.csv")
-df2.to_csv("daily_avg_exg_rate_test.csv")
-
-df_merge = df1.join(df2, how="left")
-df_merge.to_csv("daily_rate_merge_test.csv")
-print(df_merge.head())
+df = get_AllDailyRate(startDate, endDate)
 
 # plot graph
-plt.plot( df_merge.index, df_merge['DAILY_RATE'].values, )
-plt.plot( df_merge.index, df_merge['USA : DOLLAR (USD)'].values)
+plt.plot( df.index, df['DAILY_RATE'].values, )
+plt.plot( df.index, df['USA : DOLLAR (USD)'].values)
 plt.legend(['DAILY_RATE', 'USA : DOLLAR (USD)'])
 
 plt.xlabel("Date")

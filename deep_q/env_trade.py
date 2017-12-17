@@ -1,6 +1,9 @@
 import os.path
 import numpy as np
 import pandas as pd
+import math
+import shutil	
+from os.path import isfile, join, exists
 
 import matplotlib.pyplot  as plt
 import matplotlib
@@ -13,12 +16,15 @@ import prepare_data as data
 #matplotlib.use('Agg')
 # directory for log file
 LOG_PATH = 'log'
-if os.path.exists(LOG_PATH) == False:
-	os.makedirs(LOG_PATH)
-PIC_PATH = 'temp_pic'
-if os.path.exists(PIC_PATH) == False:
-	os.makedirs(PIC_PATH)
+if os.path.exists(LOG_PATH):
+	shutil.rmtree(LOG_PATH)	
+os.makedirs(LOG_PATH)
 
+PIC_PATH = 'temp_pic'
+if exists(PIC_PATH):			
+	shutil.rmtree(PIC_PATH)	
+os.makedirs(PIC_PATH)
+	
 # Declare buy and sell state (It is indexs of Q score list)
 BUY = 1
 SELL = 0
@@ -31,7 +37,7 @@ class Portfolio:
 		self.all_date = []		# save all date
 		self.all_price = []   	# save all close price
 		self.all_signal = [] 	# save all signal BUY(1), SELL(0)
-		self.all_gain = [] 		# save all gain 	
+		self.all_return = [] 		# save all gain 	
 		self.all_pic = [] 		# for html log only
 		self.name = name		
 		
@@ -74,45 +80,91 @@ class Portfolio:
 		self.all_date.append(date)			 # save all dates
 		self.all_price.append(price)		 # save all prices
 		self.all_signal.append(action_index) # save all signals BUY(1), SELL(0)
-		self.all_gain.append(sum_return)	 # save all gain
+		self.all_return.append(sum_return)	 # save all gain
 		return sum_return
-	
-	def gain(self):
-		return ind.compute_gain(pd.DataFrame(self.all_price), self.all_signal)
 		
-	def log(self, episode):		
-		df = pd.DataFrame(index=range(0, len(self.all_date)))
+	def _getAllHistory(self):
+		total_row = len(self.all_date)
+		df = pd.DataFrame(index=range(0, total_row))
 		df['date'] = pd.DataFrame(self.all_date)
 		df['price'] = pd.DataFrame(self.all_price)
 		df['signal'] = pd.DataFrame(self.all_signal)
-		df['cumulative return'] = pd.DataFrame(self.all_gain)
+		df['cumulative_return'] = pd.DataFrame(self.all_return)
 		
-		file_name = "portfolio_%s_%s.csv" % (self.name, episode)
-		file_name = os.path.join(LOG_PATH, file_name)
-		df.to_csv(file_name ,index=False)
-		return file_name
+		price = df['price']
+		signal = df['signal']
+		
+		df_sell = pd.DataFrame(index=range(0, total_row), columns=['sell'])
+		df_buy = pd.DataFrame(index=range(0, total_row) , columns=['buy'])
+		
+		if signal.loc[0] == SELL:
+			pass # if signal is SELL, first row don't take action 
+		elif signal.loc[0] == BUY:
+			df_buy.loc[0] = price.loc[0]
+		
+		# first row
+		old_signal = signal.loc[0]
+		for index in range(1, total_row):
+			new_signal = signal.loc[index]			
+			if new_signal != old_signal:
+				if new_signal == BUY:
+					df_buy.loc[index] = price.loc[index]
+				elif new_signal == SELL:
+					df_sell.loc[index] = price.loc[index]		
+			# remember old signal
+			old_signal = new_signal
+			
+		# edit finally 
+		if signal.loc[total_row-1] == BUY:
+			df_sell.loc[total_row-1] = price.loc[total_row-1]		
+		
+		df = df.join(df_sell, how="left")		
+		df = df.join(df_buy, how="left")		
+		return df
 	
-	def saveGraph(self, espisode):		
+	def report(self, episode):		
+		"""
 		df_price = pd.DataFrame(self.all_price, index=self.all_date)		
 		df_signal = pd.DataFrame(self.all_signal, index=self.all_date)									
 		df_buy = df_price.where(df_signal==BUY)	
 		df_sell = df_price.where(df_signal==SELL)
+		"""
+		# +++++++++++++ get data (Buy and Sell) +++++++++++++
+		df = self._getAllHistory()		
+		df_signal = df['signal']		
+		df_sell = df['sell']
+		df_buy = df['buy']
 		
+		# ++++++++++++ compute capital gain ++++++++++++
+		# Gain(%) = 100 x Sum(Sell(i) - Buy(i))/Sum(Buy(i))
+		# or
+		# Gain(%) = 100 x ( Sell(i)/Sum(Buy(i) -1 )
+		sum_buy = df_buy.sum() + 1e-10 # prevent division by zero
+		gain =  100 * (df_sell.sum() / sum_buy - 1)
+		
+		# +++++++++++ Save a graph to a file+++++++++++++
 		plt.figure(figsize=(10,8))	
-		plt.title(self.name)
-		plt.plot(self.all_date, self.all_price, 'c--', linewidth=0.5 ) 
-		plt.plot(self.all_date, df_buy.values, '^r',  self.all_date, df_sell.values,'og')	
+		plt.title("%s (capital gain = %f)" % (self.name, gain) )
+		plt.plot(self.all_date, self.all_price, 'c--', linewidth=0.5 ) 	# plot doted line
+		plt.plot(self.all_date, df_buy.values, '^g') # plot triangle_up	and green color
+		plt.plot(self.all_date, df_sell.values,'vr') # plot triangle_down and red color
 		
-		file_name = self.name + "_" + str(espisode) + '.png'		
-		file_name = os.path.join(PIC_PATH, file_name)
+		file_picName = "%s_%s.png"	% (self.name, episode)	
+		file_picName = os.path.join(PIC_PATH, file_picName)
 		#plt.tight_layout()
-		plt.savefig(file_name)	
+		plt.savefig(file_picName)	
 		plt.close()
-		return file_name		
 		
+		# +++++++++++++ save csv file ++++++++++++
+		file_csvName = "portfolio_%s_%s.csv" % (self.name, episode)
+		file_csvName = os.path.join(LOG_PATH, file_csvName)
+		df.to_csv(file_csvName ,index=False)
+		
+		return file_picName, file_csvName, gain	
+			
 class Environment:
 	def __init__(self, symbol, startDate, endDate):
-		# Get stock data into dataframe (pandas)		
+		# Get and hold stock data into dataframe (pandas)
 		self.all_data = data.getDataInd(symbol, startDate, endDate)
 		print("Load total stock data(days): ", len(self.all_data))		
 		self.all_data = pd.DataFrame(self.all_data[15:])	#skip blank on top's dataframe
@@ -126,7 +178,7 @@ class Environment:
 		self.symbol = symbol
 		self.num_action = 2 	# buy or sell					
 		first_data = self.all_data.iloc[0]
-		self.first_state  = self._getState(first_data)
+		self.first_state  = self._getState(first_data, self.port)
 		self.num_features = self.first_state.shape[1]
 								
 	def reset(self):
@@ -163,7 +215,11 @@ class Environment:
 				# if stock price is increse, don't buy  >> it's very bad
 				return 	total_return + (previous_price/current_price - 1)
 	"""			
-	def _getState(self, next_data):
+	def _getState(self, next_data, port):
+		hold_stock = 0
+		if port.isHold():
+			hold_stock = 1
+		
 		# declare inner function here
 		# encoding indicator to 0 or 1
 		# positive, 			:encode to 0
@@ -197,21 +253,26 @@ class Environment:
 						
 		# posible states are 2^num_features = xxxxx
 		# collect encoding data
-		concat = [c2o, daily, roc, cross_ema, macd, 
+		concat = [hold_stock, c2o, daily, roc, cross_ema, macd, 
 						up_bb1, low_bb1, obv, change_obv, rsi_value, rsi_over]		
-		return np.reshape(concat, (1,-1)) 					# shape is [1, num_features]
+		concat = np.reshape(concat, (1,-1)) 					# shape is [1, num_features]
+		assert concat.shape[1] == 12
+		return concat
 			
 	def step(self, action_index):		
 		# calculate reward from action, current price
 		current_price = self.all_data.iloc[self.index]['CLOSE']					
 		date = self.all_data.index[self.index]
 		reward = self.port.update(action_index, date, current_price)
+		"""
 		if reward > 0 : 
-			reward = 10
+			reward = 10 	
 		elif reward<0 :
 			reward = -10
-			
-		# terminate in trading a stock or not
+		"""
+		#reward = 0.1 * math.exp(reward)
+		
+		# terminate in trading or not
 		terminate = False
 		next_state = None
 		if 	len(self.all_data) <= self.index + 1: # final index
@@ -221,7 +282,7 @@ class Environment:
 			self.index +=1 				
 			# get all data for next state
 			next_data = self.all_data.iloc[self.index] 
-			next_state = self._getState(next_data)			
+			next_state = self._getState(next_data, self.port)			
 			
 		return reward, next_state, terminate
 	

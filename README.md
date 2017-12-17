@@ -6,7 +6,7 @@ This repository collects my example codes in Python for studing in [The Stock Ex
 
 ## Requirement
 
-All examples are written in Python language, so you need to setup your environments as below
+All examples are written in Python language, so you need to setup your environments as below 
 
 * First, install [ANACONDA](https://www.continuum.io/downloads)
 * For Deep learning, I used 2 library including TensorFlow and Keras
@@ -25,7 +25,7 @@ And you can also install Keras from PyPI with the command
 
 `pip install fix_yahoo_finance`
 
-* Install googlefinance for getting data from [google finance](https://www.google.com/finance)
+* Install googlefinance for getting data from [google finance](https://www.google.com/finance) 
 
 `pip install  googlefinance`
 
@@ -42,7 +42,7 @@ Download datasets (EOD data files from SET)
 ## My source codes
 
 
-### 1) [LSTM_predict_trend.py](LSTM_predict_trend.py)
+### 1) [LSTM_predict_trend.py](LSTM_predict_trend.py) 
 
 I'm trying to apply Deep Learning (LSTM network) to predict a stock trend (not complete)
 
@@ -57,9 +57,10 @@ For example code in HTML/JavaScript, JavaScript with Node.js and Python, I share
 
 ![image bot api](images/test_bot_api.PNG)
 
-__Example codes for "Daily Weighted-average Interbank Exchange Rate - THB / USD"__
+_Example codes for "Daily Weighted-average Interbank Exchange Rate - THB / USD"_
 
-### 3) [indicator.py](indicator.py)
+
+### 3) [indicator.py](indicator.py) 
 
 There are my examples to compute the technical indicators for securities including
 
@@ -74,7 +75,7 @@ There are my examples to compute the technical indicators for securities includi
 * [Beta](http://www.investopedia.com/terms/b/beta.asp?lgl=rira-baseline-vertical)
 * [K% and D%](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:stochastic_oscillator_fast_slow_and_full)
 * [OBV](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:on_balance_volume_obv)
-* compute gain
+* compute gain 
 * and etc
 
 

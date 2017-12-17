@@ -1,6 +1,7 @@
 import os.path
 import random
 import numpy as np
+import pandas as pd
 from collections import deque
 
 from keras import optimizers
@@ -29,7 +30,7 @@ class DeepQAgent:
 		self.h5_file = os.path.join(MODEL_PATH,'%s_weights.h5' % (env.symbol))
 		self.model = self._buildModel(env.num_features, env.num_action)
 		self.json_file = os.path.join(MODEL_PATH,'%s_structure.json' % (env.symbol))
-		self.num_action = env.num_action 	# 2 action: BUY or SELL
+		self.num_action = env.num_action 	# 2 action: BUY or SELLs
 		
 	# This is neural network model for the the Q-function		
 	def _buildModel(self, num_features, num_output):				
@@ -64,13 +65,15 @@ class DeepQAgent:
 			
 		# Otherwise select the best action from Q(now_state, all_action)
 		# Exploit method found actions that there is maximum of Q score
-		return self.getBestAction(state)
+		best_index, _ = self.getBestAction(state)
+		return best_index
 			
 	def getBestAction(self, state):
 		Q_scores = self.model.predict(state)
 		# np.argmax() will return the indices of the maximum values 
-		return np.argmax(Q_scores) 
-	
+		best_index = np.argmax(Q_scores)
+		return	best_index, Q_scores
+		
 	def saveExperience(self, state, action_index, reward, nextstate, terminate):
 		# store the transition (states) in D (replay memory)
 		self.D.append((state, action_index, reward, nextstate, terminate))
@@ -99,7 +102,7 @@ class DeepQAgent:
 		X_train = np.squeeze(np.array(X_train), axis=1)
 		y_train = np.array(y_train)		
 		# Single gradient update over one batch of samples.
-		# equals rhis sentence ==> self.model.fit(X_train, y_train, batch_size=self.BATCH_SIZE, epochs=1, verbose=0)
+		# equals this command ==> self.model.fit(X_train, y_train, batch_size=self.BATCH_SIZE, epochs=1, verbose=0)
 		self.model.train_on_batch(X_train, y_train)
 
 	def replayExperienceWhen(self, step_observe):

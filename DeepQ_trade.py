@@ -16,9 +16,12 @@ import os.path
 from tqdm import tqdm
 
 # my package
-from deep_q.env_trade import Environment
+from deep_q.env_trade import Environment, LOG_PATH
 from deep_q.agent import DeepQAgent
 from deep_q.animation import Visualization
+
+import logging
+logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s', level=logging.DEBUG)
 
 np.random.seed(555)  # for reproducibility
 """
@@ -93,8 +96,8 @@ class ModelLSTM:
 		else:
 			return all_data[index: index+self.num_sequence] 
 """
-
-def createLogHTML(prefix_name, all_gain, all_pic):		
+# for debug only
+def createLogHTML(prefix_name, log_path, all_pic):		
 	def _convertListToCode(list):
 		# convert list to code in string
 		return "['" + "','".join(map(str, list )) + "']"	
@@ -103,14 +106,14 @@ def createLogHTML(prefix_name, all_gain, all_pic):
 	list_pic = list_pic.replace("\\","/")	
 	#output example 
 	# list_pic =   ['temp_pic/BBL_0.png', 'temp_pic/BBL_1.png', 'temp_pic/BBL_2.png']	
-	list_gain = _convertListToCode(all_gain)
+	#list_gain = _convertListToCode(all_gain)
 	
 	f = open("log_template.html","r")
 	html_template = f.read()		
 	f.close()
 	
 	# inject lis_code into html template
-	html = html_template % (list_gain, list_pic)	
+	html = html_template % (log_path, list_pic)
 	# and save html file	
 	file_name = prefix_name + "_" + "log.html"
 	f = open(file_name, "w")
@@ -118,12 +121,9 @@ def createLogHTML(prefix_name, all_gain, all_pic):
 	f.close()
 	return file_name
 	
-def training_agent(total_episode = 10):
-	# set Environment for trading
-	start_time = time.time()
-	symbol="BBL" # test for stock of thailand only
-	startDate = '2017-01-01'
-	endDate = strftime("%Y-%m-%d", gmtime())
+def training_agent(symbol, startDate, endDate, total_episode = 100):	
+	start_time = time.time()	
+	# set Environment for trading	
 	env = Environment(symbol, startDate, endDate)		
 	agent = DeepQAgent(env)		
 	all_gain, all_pic = [], []
@@ -153,7 +153,7 @@ def training_agent(total_episode = 10):
 			# for debug only
 			step_observe += 1
 			if step_observe%100 == 0: 
-				print("Step trade at: %s | Cumulative return: %s " % (step_observe, port.gain()))        
+				print("Step trade at: %s | Cumulative return: %s " % (step_observe, port.sum_return))        
 						
 		# when finish each episode
 		agent.saveModel()	# save the neural network model to files
@@ -162,38 +162,56 @@ def training_agent(total_episode = 10):
 		agent.reduceExplore(total_episode)		
 		print("epsilon: %.2f" % agent.epsilon)
 		
-		#+++++++++ for debug only +++++++++++++++++++
-		gain = port.gain()
+		#+++++++++ for debug only in each episode +++++++++++++++++++
+		file_pic, file_csv, gain = port.report(episode+1)			
+		print("Compute gain: ", gain)								
+		print("Generate a graph figure to a file:", file_pic) 
+		print("Log portfolio to a csv file: ", file_csv)	
 		all_gain.append(gain)
-		print("Compute gain: ", gain)						
-		file_pic = port.saveGraph(episode)	
 		all_pic.append(file_pic)
-		print("Generate a graph figure to files:", file_pic)
-		print("Log portfolio to csv files: ", port.log(episode))	
-	
-	sec = datetime.timedelta(seconds=int(time.time() - start_time))			
-	
-	# create log html
-	file_log = createLogHTML(symbol, all_gain, all_pic)	
-	# If your system set IE is default, it may be don't show logs on your webbrowser
-	webbrowser.open('file://' + os.path.realpath(file_log))
-	
+		
+	sec = datetime.timedelta(seconds=int(time.time() - start_time))	
 	print ("\nCompilation Time : ", str(sec))			
 	print("Training all episode finished!")
 	print("************************")
-		
-	print("\n************************")
+	
+	
+	print("\n*********Runing on the best action**********")
 	print("Run agent")
 	env.reset()  # reuse same environment with reset to start trading
 	terminate = False
 	s_t = env.first_state
+	log_agent = []
 	while(terminate != True):
-		a_t = agent.getBestAction(s_t)		
+		a_t, qscore = agent.getBestAction(s_t)		
 		_, s_t, terminate = env.step(a_t)
+		log_agent.append( np.append(qscore, a_t))
 	port = env.getPortfolio()
-	print("Gain of portfolio: ", port.gain())		
-	print("Log portfolio csv files")
-	port.log("run")			
+	file_pic, file_csv, gain = port.report(episode= "agent_run")	
+	print("Compute gain: ", gain)								
+	print("Generate a graph figure to files:", file_pic)
+	print("Log portfolio to csv files: ", file_csv)	
+	
+	# create csv log file when runing on the best action	
+	# for debug when run finally 
+	import pandas as pd	
+	df_csv = pd.read_csv(file_csv)	
+	df_agent = pd.DataFrame(data=np.vstack(log_agent) ,columns=['sell_score', 'buy_score', 'best_action'])
+	df_log = df_csv.join(df_agent, how="left")
+	file_csv = os.path.join(LOG_PATH, "log_" + symbol + "_agent_run.csv")
+	df_log.to_csv(file_csv) 
 
+	# For debug only
+	# create log html
+	all_pic.append(file_pic)	
+	dir_log = os.path.join("file:///" + os.path.dirname(os.path.abspath(__file__)), LOG_PATH)	
+	file_log = createLogHTML(symbol, dir_log, all_pic)	
+	# If your system set IE is default, it may be don't show logs on your webbrowser
+	webbrowser.open('file://' + os.path.realpath(file_log))
+	
 if __name__ == "__main__" :
-	training_agent()
+	# test for stock of thailand only
+	symbol = 'PTT'
+	startDate='2017-06-01'
+	endDate = strftime("%Y-%m-%d", gmtime())
+	training_agent(symbol, startDate, endDate, total_episode=10)

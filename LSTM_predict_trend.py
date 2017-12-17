@@ -102,6 +102,7 @@ def trainModel(symbolName, Xtrain, Ytrain, Xtest, Ytest, epochs):
 	utm.saveTrainedModel(model, json_file, h5_file)	
 	return model, history
 
+"""
 def filterSignal(Ydigits):
 	signal = np.copy(Ydigits)	
 	for index in range(1, len(Ydigits)-1):
@@ -110,7 +111,7 @@ def filterSignal(Ydigits):
 		future = Ydigits[index+1]
 		signal[index+1] = utm.getSignal(previous, current, future) # future		
 	return np.reshape(signal,(-1,1))
-
+"""
 import pickle
 symbolList = pickle.load( open( "symbol_list.p", "rb" ) )
 symbolList = symbolList[0:20]
@@ -128,7 +129,7 @@ if count_upTrend < 0.4 * count_upTrend:
 	print('Number uptrend: %s , not: %s' % (count_upTrend , len(Y)-count_upTrend))
 	sys.exit(1) 
 
-signal = filterSignal(Y)
+signal = utm.getSignal(Y)
 print("Select securities symbol:", symbol)
 print("Total days: ", numDays)
 utg.plot1ColLine(symbol, close, signal,'Signal: ' + symbol)
@@ -162,10 +163,10 @@ print("But predict (test):\n", predTestEncoded.reshape(-1))
 
 trainPrice = close.ix[0:predEncoded.size]
 testPrice = close.ix[-predTestEncoded.size:]
-signal = filterSignal(predEncoded)
+signal = utm.getSignal(predEncoded)
 
 utg.plot1ColLine(symbol, trainPrice, signal, 'Predict signal: ' + symbol)
-print(ind.compute_gain(trainPrice, filterSignal(Ytrain)))
+print(ind.compute_gain(trainPrice, utm.getSignal(Ytrain)))
 
         
 
