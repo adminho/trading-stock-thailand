@@ -1,3 +1,5 @@
+The project will be updated continuously ......  :fire:
+
 # Trading example codes (not yet)
 
 This repository collects my example codes in Python for studing in [The Stock Exchange of Thailand (SET)](http://www.set.or.th/set/mainpage.do) that is developing (__not yet__)
@@ -16,6 +18,16 @@ You can install TensorFlow from PyPI with the command
 And you can also install Keras from PyPI with the command
 
 `pip install keras`
+
+* Install pandas_datareader for getting data from [yahoo finance](https://finance.yahoo.com/) and also install fix_yahoo_finance (fix bugs).
+
+`pip install pandas_datareader`
+
+`pip install fix_yahoo_finance`
+
+* Install googlefinance for getting data from [google finance](https://www.google.com/finance)
+
+`pip install  googlefinance`
 
 * Install tqdm to make my loops show a smart progress meter on console
 
@@ -51,7 +63,19 @@ __Example codes for "Daily Weighted-average Interbank Exchange Rate - THB / USD"
 
 There are my examples to compute the technical indicators for securities including
 
-`ROC, Bollinger Band (BBANDS), daily returns, SMA, EMA, MACD, RSI, Sharpe ratio,True Range (TR), ATR, Beta, OBV and etc`
+* [ROC](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:rate_of_change_roc_and_momentum)
+* [Bollinger Band (BBANDS)](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:bollinger_bands)
+* daily returns
+* [SMA and EMA](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_averages)
+* [MACD and signal](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_average_convergence_divergence_macd)
+* [RSI](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi)
+* [Sharpe ratio](http://www.investopedia.com/terms/s/sharperatio.asp?lgl=rira-baseline-vertical)
+* [True Range (TR) and ATR](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_true_range_atr)
+* [Beta](http://www.investopedia.com/terms/b/beta.asp?lgl=rira-baseline-vertical)
+* [K% and D%](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:stochastic_oscillator_fast_slow_and_full)
+* [OBV](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:on_balance_volume_obv)
+* compute gain
+* and etc
 
 
 ### 4) [DeepQ_trade.py](DeepQ_trade.py)
@@ -59,10 +83,14 @@ There are my examples to compute the technical indicators for securities includi
 I'm trying to apply Deep Q-learning (Reinforcement Learning) to automatic trading (not complete)
 
 
-## Credit
+## Thank you
 
 I Borrowed some codes from
 
 * https://www.udacity.com/course/machine-learning-for-trading--ud501
 * http://matplotlib.org/examples/pylab_examples/finance_demo.
 
+## Knowledge
+
+* https://www.udacity.com/course/machine-learning-for-trading--ud501
+* https://www.datacamp.com/community/tutorials/finance-python-trading
