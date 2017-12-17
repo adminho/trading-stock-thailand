@@ -57,7 +57,7 @@ For example code in HTML/JavaScript, JavaScript with Node.js and Python, I share
 
 ![image bot api](images/test_bot_api.PNG)
 
-_Example codes for "Daily Weighted-average Interbank Exchange Rate - THB / USD"_
+_Example API for "Daily Weighted-average Interbank Exchange Rate - THB / USD"_
 
 
 ### 3) [indicator.py](indicator.py) 
