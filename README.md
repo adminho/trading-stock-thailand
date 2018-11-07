@@ -90,9 +90,9 @@ I'm trying to apply Deep Reinforcement Learning (Deep Q-learning) as stated in t
 
 I use datasets from http://siamchart.com/stock/ that is a EOD file.
 
-* [siamchart_csv.py](siamchart_csv.py) use convert the EOD file to stock csv files.
-* [siamchart_csv2db.py](siamchart_csv2db.py) use convert the stock csv files to SQL database ([sqlite](https://docs.python.org/2/library/sqlite3.html)).
-* [siamchart_csv2json.py](siamchart_csv2json.py) use convert the stock csv file to json files.
+* [siamchart_csv.py](datasets/siamchart_csv.py) use convert the EOD file to stock csv files.
+* [siamchart_csv2db.py](datasets/siamchart_csv2db.py) use convert the stock csv files to SQL database ([sqlite](https://docs.python.org/2/library/sqlite3.html)).
+* [siamchart_csv2json.py](datasets/siamchart_csv2json.py) use convert the stock csv file to json files.
 
 ## Thank you
 
