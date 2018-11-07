@@ -49,7 +49,7 @@ def json_to_df(file_json, jsonPath=SEC_JSON_PATH):
 
 if __name__ == "__main__" :		
 	file = 'stock.json'
-	files_csv = list_csv(end=50) # select 50 files
+	files_csv = list_csv(end=5) # select 50 files
 	csv_to_json(file, files_csv)
 	stock_list = json_to_df(file)	
 	print(stock_list[0][1].head())	
