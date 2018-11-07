@@ -44,7 +44,7 @@ Download datasets (EOD data files from SET)
 
 ### 1) [LSTM_predict_trend.py](LSTM_predict_trend.py) 
 
-I'm trying to apply Deep Learning (LSTM network) to predict a stock trend (not complete)
+I'm trying to apply Deep Learning (LSTM network) to predict a stock trend (not complete).
 
 
 ### 2) [BOT_API_example.py](BOT_API_example.py)
@@ -79,10 +79,12 @@ There are my examples to compute the technical indicators for securities includi
 * and etc
 
 
-### 4) [DeepQ_trade.py](DeepQ_trade.py)
+### 4) Deep Reinforcement Learning 
 
-I'm trying to apply Deep Q-learning (Reinforcement Learning) to automatic trading (work in progress)
+I'm trying to apply Deep Reinforcement Learning (Deep Q-learning) as stated in the paper [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf) to automatic trading  (work in progress)
 
+* [DeepQ_trade.py](DeepQ_trade.py) is first version (not complete).
+* [RL_trade](RL_trade.py) is second version that I borrowed some codes from https://github.com/cstorm125/rl_trader that is Deep Q-learning for Bitcoin (not complete)..
 
 ## Thank you
 
@@ -90,7 +92,7 @@ I Borrowed some codes from
 
 * https://www.udacity.com/course/machine-learning-for-trading--ud501
 * http://matplotlib.org/examples/pylab_examples/finance_demo.
-* https://github.com/cstorm125/rl_trader?fbclid=IwAR20V19eBYnt1Ly0OlnZPkCaxnZD_W8Pfs5j01FXMquWA_EpaLzctSa5N7o
+* https://github.com/cstorm125/rl_trader
 
 ## Knowledge
 
