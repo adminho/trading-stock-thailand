@@ -96,3 +96,4 @@ I Borrowed some codes from
 
 * https://www.udacity.com/course/machine-learning-for-trading--ud501
 * https://www.datacamp.com/community/tutorials/finance-python-trading
+* [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf)
