@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
 import json 
+import sqlite3
+
 from os import listdir 
 from os.path import isfile, join 
 from datetime import datetime
-
-import sqlite3
+from tqdm import tqdm
 
 CSV_PATH = 'D:/MyProject/Big-datasets/data_stock/sec_csv/'
 DATABASE_PATH = 'db/stocks.db'
@@ -50,7 +51,7 @@ def list_csv(dirPath=CSV_PATH, start=0, end=None):
 def insert_table(files_list, conn, dirPath=CSV_PATH):
 	c = conn.cursor()
 	data_stock = []
-	for id, file in enumerate(files_list):		
+	for id, file in tqdm(enumerate(files_list)):		
 		df = pd.read_csv(join(dirPath, file))
 		#print(df.columns) # Index(['DATE', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'], dtype='object')	
 		symbol = file.replace('.csv','')

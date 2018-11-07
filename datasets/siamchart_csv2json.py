@@ -1,11 +1,13 @@
 import os
-from os import listdir, makedirs
-from os.path import isfile, join, exists
 import json 
 import numpy as np
 import pandas as pd
 import shutil
+
 from collections import namedtuple	
+from os import listdir, makedirs
+from os.path import isfile, join, exists
+from tqdm import tqdm
 
 CSV_PATH = 'D:/MyProject/Big-datasets/data_stock/sec_csv/'
 SEC_JSON_PATH = "sec_json"
@@ -26,7 +28,7 @@ def list_csv(dirPath=CSV_PATH, start=0, end=None):
 def csv_to_json(file_json, files_csv, jsonPath=SEC_JSON_PATH, csvPath=CSV_PATH ):
 	clearDir() # delete old files	
 	with open(join(jsonPath, file_json), 'w') as f:
-		for id, file in enumerate(files_csv):		
+		for id, file in tqdm(enumerate(files_csv)):		
 			df = pd.read_csv( join(csvPath, file))
 			data= df.to_json(orient='records') # data = df.to_json(orient='index')
 			symbol = file.replace('.csv','')		

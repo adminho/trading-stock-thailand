@@ -1,15 +1,14 @@
 import os
-from os import listdir, makedirs
-from os.path import isfile, join, exists
 import numpy as np
 import pandas as pd
 import shutil	
-
 import matplotlib.pyplot as plt
+
+from os import listdir, makedirs
+from os.path import isfile, join, exists
 from matplotlib.finance import date2num
 from matplotlib.dates import DateFormatter, WeekdayLocator,DayLocator, MONDAY
 from matplotlib.finance import candlestick_ohlc
-
 from tqdm import tqdm
 
 # Requirement
