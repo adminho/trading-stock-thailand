@@ -81,7 +81,7 @@ There are my examples to compute the technical indicators for securities includi
 
 ### 4) [DeepQ_trade.py](DeepQ_trade.py)
 
-I'm trying to apply Deep Q-learning (Reinforcement Learning) to automatic trading ((work in progress))
+I'm trying to apply Deep Q-learning (Reinforcement Learning) to automatic trading (work in progress)
 
 
 ## Thank you
