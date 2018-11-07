@@ -1,21 +1,21 @@
-The project will be updated continuously ......  :fire:
+:fire: ... The project will be updated continuously ......  :fire:
 
 # Trading example codes (not yet)
 
-This repository collects my example codes in Python for studing in [The Stock Exchange of Thailand (SET)](http://www.set.or.th/set/mainpage.do) that is developing (__not yet__)
+This repository collects my example codes in Python for studing in [The Stock Exchange of Thailand (SET)](http://www.set.or.th/set/mainpage.do) (__not yet__).
 
 ## Requirement
 
-All examples are written in Python language, so you need to setup your environments as below 
+All examples are written in Python language, so you need to setup your environments as below. 
 
-* First, install [ANACONDA](https://www.continuum.io/downloads)
-* For Deep learning, I used 2 library including TensorFlow and Keras
+* First, install [ANACONDA](https://www.continuum.io/downloads).
+* For Deep learning, I used 2 library including TensorFlow and Keras.
 
-You can install TensorFlow from PyPI with the command
+You can install TensorFlow from PyPI with the command.
 
 `pip install tensorflow`
 
-And you can also install Keras from PyPI with the command
+And you can also install Keras from PyPI with the command.
 
 `pip install keras`
 
@@ -25,7 +25,7 @@ And you can also install Keras from PyPI with the command
 
 `pip install fix_yahoo_finance`
 
-* Install googlefinance for getting data from [google finance](https://www.google.com/finance) 
+* Install googlefinance for getting data from [google finance](https://www.google.com/finance). 
 
 `pip install  googlefinance`
 
@@ -84,7 +84,15 @@ There are my examples to compute the technical indicators for securities includi
 I'm trying to apply Deep Reinforcement Learning (Deep Q-learning) as stated in the paper [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf) to automatic trading  (work in progress)
 
 * [DeepQ_trade.py](DeepQ_trade.py) is first version (not complete).
-* [RL_trade](RL_trade.py) is second version that I borrowed some codes from https://github.com/cstorm125/rl_trader that is Deep Q-learning for Bitcoin (not complete)..
+* [RL_trade](RL_trade.py) is second version that I borrowed some codes from https://github.com/cstorm125/rl_trader as Deep Q-learning for Bitcoin (not complete).
+
+### 5) Datasets of [The Stock Exchange of Thailand (SET)](http://www.set.or.th/set/mainpage.do)
+
+I use datasets from http://siamchart.com/stock/ that is a EOD file.
+
+* [siamchart_csv.py](siamchart_csv.py) use convert the EOD file to stock csv files.
+* [siamchart_csv2db.py](siamchart_csv2db.py) use convert the stock csv files to SQL database ([sqlite](https://docs.python.org/2/library/sqlite3.html)).
+* [siamchart_csv2json.py](siamchart_csv2json.py) use convert the stock csv file to json files.
 
 ## Thank you
 
