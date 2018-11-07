@@ -90,6 +90,7 @@ I Borrowed some codes from
 
 * https://www.udacity.com/course/machine-learning-for-trading--ud501
 * http://matplotlib.org/examples/pylab_examples/finance_demo.
+* https://github.com/cstorm125/rl_trader?fbclid=IwAR20V19eBYnt1Ly0OlnZPkCaxnZD_W8Pfs5j01FXMquWA_EpaLzctSa5N7o
 
 ## Knowledge
 
