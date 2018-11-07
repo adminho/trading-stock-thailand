@@ -84,7 +84,7 @@ There are my examples to compute the technical indicators for securities includi
 I'm trying to apply Deep Reinforcement Learning (Deep Q-learning) as stated in the paper [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf) to automatic trading  (work in progress)
 
 * [DeepQ_trade.py](DeepQ_trade.py) is first version (not complete).
-* [RL_trade](RL_trade.py) is second version that I borrowed some codes from https://github.com/cstorm125/rl_trader as Deep Q-learning for Bitcoin (not complete).
+* [RL_trader](RL_trader.py) is second version that I borrowed some codes from https://github.com/cstorm125/rl_trader as Deep Q-learning for Bitcoin (not complete).
 
 ### 5) Datasets of [The Stock Exchange of Thailand (SET)](http://www.set.or.th/set/mainpage.do)
 
