@@ -60,14 +60,12 @@ def insert_table(files_list, conn, dirPath=CSV_PATH):
 	c.executemany('INSERT INTO STOCKS VALUES (?,?,?)', data_stock)
 	conn.commit()
 
-
 # We can also close the connection if we are done with it.
 # Just be sure any changes have been committed or they will be lost.
 # conn.close()
 # https://docs.python.org/2/library/sqlite3.html
 # https://www.w3schools.com/python/python_mongodb_getstarted.asp
 # https://www.sqlite.org/docs.html
-
 
 if __name__ == "__main__" :	
 	conn = sqlite3.connect(DATABASE_PATH)
