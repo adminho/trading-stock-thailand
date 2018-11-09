@@ -8,7 +8,7 @@ import pandas as pd
 from pandas_datareader import data as pdr
 # Requirement 
 # pip install fix_yahoo_finance
-import fix_yahoo_finance as yf # <== that's all it takes :-)
+#import fix_yahoo_finance as yf # <== that's all it takes :-)
 
 import matplotlib.pyplot as plt
 from matplotlib.finance import date2num
@@ -113,7 +113,7 @@ if __name__ == "__main__":
 	createSymbolCSV(df, "PTT")
 	
 	#symbols = ["PTT", "AOT", "SCC", "CPALL"]
-	symbols = ["CPALL", "BEAUTY", "COM7", "FSMART", "LIT" , "MTLS", "SAWAD", "GPSC"]
+	symbols = ["CPALL", "BEAUTY", "COM7", "FSMART", "LIT" , "SAWAD", "GPSC"]
 	print("\nExample of all data of:", symbols)
 	all_data = loadBigData(symbols, startDate, endDate)	
 	print(all_data)
