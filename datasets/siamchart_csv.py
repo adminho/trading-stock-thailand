@@ -76,7 +76,8 @@ DIR_CURRENT = os.path.dirname(__file__)
 DIR_SEC_CSV = "sec_csv"
 
 # download: http://siamchart.com/stock/	 (Must register to login)
-EOD_file = "D:/MyProject/Big-datasets/data_stock/set-archive_EOD_UPDATE"
+#EOD_file = "D:/MyProject/Big-datasets/data_stock/set-archive_EOD_UPDATE"
+EOD_file = "set-archive_EOD_UPDATE"
 def createSymbolCSV(start_idex, outputPath=DIR_SEC_CSV):
 	eodFiles = getFileNameInDir(EOD_file)	
 	eodFiles = eodFiles[-1 * start_idex:]		# select files at latest N days
@@ -112,9 +113,10 @@ def load_OHLCV(symbol, dates,
 		
 	base_dir = join(DIR_CURRENT,base_dir)
 	csv_file = os.path.join(base_dir, "{}.csv".format(symbol)) 
-	# df_csv = pd.read_csv(csv_file, index_col='Date',
+	
 	df_csv = pd.read_csv(csv_file, index_col='DATE',
-		parse_dates=True, usecols=column_names, na_values=['nan'])
+						parse_dates=True, usecols=column_names, 
+						na_values=['nan'])
 	
 	"""Read securities data for given symbols from CSV files."""
 	if dates is None:
@@ -144,11 +146,12 @@ def loadManySymbols(symbols, dates, column_name, base_dir):
 	base_dir = join(DIR_CURRENT,base_dir)
 	for symbol in symbols:
 		# read CSV file path given symbol.
-		csv_file = os.path.join(base_dir, symbol + '.csv'); 
+		csv_file = os.path.join(base_dir, symbol + '.csv') 
 		#df_temp = pd.read_csv(csv_file, index_col='Date',		
 			#parse_dates=True, usecols=['Date', column_name], na_values=['nan'])
 		df_temp = pd.read_csv(csv_file, index_col='DATE',
-			parse_dates=True, usecols=['DATE', column_name], na_values=['nan'])
+			parse_dates=True, usecols=['DATE', column_name], 
+			na_values=['nan'])
 		
 		df_temp = df_temp.rename(columns={column_name: symbol})
 		df = df.join(df_temp) # left join by default
