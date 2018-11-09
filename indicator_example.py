@@ -1,7 +1,7 @@
 from time import gmtime, strftime
 import matplotlib.pyplot as plt
 import pandas as pd
-import datasets.siamchart as ds
+import datasets.siamchart_csv as ds
 
 # not sure	
 def ema(df, periods=12):
