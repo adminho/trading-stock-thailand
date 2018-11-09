@@ -79,8 +79,8 @@ if __name__ == "__main__" :
 	for row in c.execute(
 		'''SELECT symbol, date, open, high, low, close, volume 
 		FROM Stocks INNER JOIN Data ON stocks.id = data.id_symbol
-		'''):
-		print (row)
+		'''):	
+		print(row)
 	
 	df = pd.read_csv(join(CSV_PATH, '!AGRO.csv'))
 	for count in c.execute(
