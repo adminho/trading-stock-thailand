@@ -71,6 +71,10 @@ def removeOldFile(symbol, output_path=DIR_SEC_CSV):
         remove(csv_file)	
 
 if __name__ == "__main__" :
+    table_element, url_string = getTableData("PTT")
+    tr_list = table_element.findAll('tr')
+    print(tr_list[0:2])
+
     symbol_list = ['AOT', 'BBL']
     for symbol in symbol_list:
         df = create_all_data(symbol, total_page = 2)
