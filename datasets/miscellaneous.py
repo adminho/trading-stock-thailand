@@ -53,7 +53,7 @@ except:
 # or pip install fix_yahoo_finance --upgrade
 print("+++++pandas_datareader+++++")
 from pandas_datareader import data as pdr
-import fix_yahoo_finance as yf # <== that's all it takes :-)
+#import fix_yahoo_finance as yf # <== that's all it takes :-)
 # For Stock of Thailand, the symbol must be followed with '.BK'
 # download dataframe
 try:
