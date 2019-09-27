@@ -42,12 +42,7 @@ Download datasets (EOD data files from SET)
 ## My source codes
 
 
-### 1) [LSTM_predict_trend.py](LSTM_predict_trend.py) 
-
-I'm trying to apply Deep Learning (LSTM network) to predict a stock trend (not complete).
-
-
-### 2) [BOT_API_example.py](BOT_API_example.py)
+### 1) [BOT_API_example.py](BOT_API_example.py)
 
 Since Bank of Thailand (BOT) has provided [21 APIs](https://iapi.bot.or.th/Developer?lang=th) for query data including Exchange rate, Interest Rate and Debt securities auction so I would like to show examples howto use 2 APIs such as
 - Daily Weighted-average Interbank Exchange Rate - THB / USD
@@ -59,6 +54,13 @@ For example codes in HTML+JavaScript, JavaScript with Node.js and Python, I shar
 
 _An example when using "Daily Weighted-average Interbank Exchange Rate - THB / USD" API_
 
+### 2) Datasets of [The Stock Exchange of Thailand (SET)](http://www.set.or.th/set/mainpage.do)
+
+I use datasets from http://siamchart.com/stock/ that is a EOD file.
+
+* [siamchart_csv.py](datasets/siamchart_csv.py) use convert the EOD file to stock csv files.
+* [siamchart_csv2db.py](datasets/siamchart_csv2db.py) use convert the stock csv files to SQL database ([sqlite](https://docs.python.org/2/library/sqlite3.html)).
+* [siamchart_csv2json.py](datasets/siamchart_csv2json.py) use convert the stock csv file to json files.
 
 ### 3) [indicator.py](indicator.py) 
 
@@ -78,21 +80,21 @@ There are my examples to compute the technical indicators for securities includi
 * compute gain 
 * and etc
 
+### 4) [LSTM_predict_trend.py](LSTM_predict_trend.py) 
 
-### 4) Deep Reinforcement Learning 
+I'm trying to apply Deep Learning (LSTM network) to predict a stock trend (not complete).
+
+### 5) [CNN_predict_trend.py]() 
+
+.... ✍ Pending
+
+### 5) Deep Reinforcement Learning 
 
 I'm trying to apply Deep Reinforcement Learning (Deep Q-learning) as stated in the paper [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf) to automatic trading  (work in progress)
 
 * [DeepQ_trade.py](DeepQ_trade.py) is first version (not complete).
 * [RL_trader](RL_trader.py) is second version that I borrowed some codes from https://github.com/cstorm125/rl_trader as Deep Q-learning for Bitcoin (not complete).
 
-### 5) Datasets of [The Stock Exchange of Thailand (SET)](http://www.set.or.th/set/mainpage.do)
-
-I use datasets from http://siamchart.com/stock/ that is a EOD file.
-
-* [siamchart_csv.py](datasets/siamchart_csv.py) use convert the EOD file to stock csv files.
-* [siamchart_csv2db.py](datasets/siamchart_csv2db.py) use convert the stock csv files to SQL database ([sqlite](https://docs.python.org/2/library/sqlite3.html)).
-* [siamchart_csv2json.py](datasets/siamchart_csv2json.py) use convert the stock csv file to json files.
 
 ## Thank you
 
