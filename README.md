@@ -95,7 +95,7 @@ I'm trying to apply Deep Reinforcement Learning (Deep Q-learning) as stated in t
 * [DeepQ_trade.py](DeepQ_trade.py) is first version (not complete).
 * [RL_trader](RL_trader.py) is second version that I borrowed some codes from https://github.com/cstorm125/rl_trader as Deep Q-learning for Bitcoin (not complete).
 
-### 8) Example for get Data Stock on Colab
+### 8) Example: get stock information on Colab
 
 * [My example codes at here](https://colab.research.google.com/drive/1XSE1DRLIUzLqfnfPvS4ZMbjZ2s20ub7V)
 
