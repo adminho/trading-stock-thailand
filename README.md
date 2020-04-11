@@ -113,3 +113,8 @@ I Borrowed some codes from
 * https://www.udacity.com/course/machine-learning-for-trading--ud501
 * https://www.datacamp.com/community/tutorials/finance-python-trading
 * [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf)
+
+## ขออนุญาตประชาสัมพันธ์ (แอบขายของ)
+ท่านใดสนใจซื้อ "หนังสือ AI ไม่ยาก เข้าใจได้ด้วยเลขม. ปลาย" สามารถคลิกเข้าไปในลิงค์ตามรูปได้
+
+[![](books/ebook_AI_easy_1.png)](https://www.mebmarket.com/index.php?action=BookDetails&data=YToyOntzOjc6InVzZXJfaWQiO3M6NzoiMTcyNTQ4MyI7czo3OiJib29rX2lkIjtzOjY6IjEwODI0NiI7fQ&fbclid=IwAR3E5FYdTrQQUToZfE0k7xJEEimSMXQaGBtpM8397XxAY_PnbbyIdHxvRhI&page_no=1)
