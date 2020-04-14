@@ -97,8 +97,8 @@ I'm trying to apply Deep Reinforcement Learning (Deep Q-learning) as stated in t
 
 ### 8) Example: get stock information on Colab
 
-* [My example codes at here](https://colab.research.google.com/drive/1XSE1DRLIUzLqfnfPvS4ZMbjZ2s20ub7V)
-
+1. [My example codes at here](https://colab.research.google.com/drive/1XSE1DRLIUzLqfnfPvS4ZMbjZ2s20ub7V)
+2. [All codes](https://colab.research.google.com/drive/1R2nSuYrLcIrv_DwI0h9mLVcbBdaa7D0S)
 
 ## Thank you
 
